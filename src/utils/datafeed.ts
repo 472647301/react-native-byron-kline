@@ -201,6 +201,13 @@ export default class Datafeed {
     this.barsPulseUpdater.unsubscribeDataListener(subscriberUID)
     this.debugLog('Datafeed unsubscribeBars done.', subscriberUID)
   }
+
+  /**
+   * name
+   */
+  public crossHairMoved(aaa:any) {
+    console.log('--------', 'crossHairMoved', aaa)
+  }
 }
 
 export interface IDatafeed extends Datafeed {}

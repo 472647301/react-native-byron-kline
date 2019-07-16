@@ -107,7 +107,7 @@ class App extends React.Component {
    */
   public returnOptions() {
     return {
-      //debug: true,
+      debug: true,
       locale: 'en',
       preset: 'mobile',
       fullscreen: true,

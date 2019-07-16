@@ -19,5 +19,7 @@ export default [
   'header_fullscreen_button',
   'legend_context_menu',
   'volume_force_overlay',
-  'context_menus'
+  'context_menus',
+  'source_selection_markers'
+  // 'create_volume_indicator_by_default' // 隐藏成交量
 ]
