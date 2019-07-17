@@ -1,17 +1,24 @@
 import Vue from 'vue'
+import enabled from '../config/enabled'
+import Datafeed from '../utils/datafeed'
 import Component from 'vue-class-component'
+import * as options from '../config/options'
 import { IDatafeed } from '../utils/datafeed'
 import * as IChart from '../types/chart.min'
-import Datafeed from '../utils/datafeed'
 import overrides from '../config/overrides'
 import disabled from '../config/disabled'
-import enabled from '../config/enabled'
+
+// const data = require('../data')
 
 @Component
 class MainMixin extends Vue {
   public datafeed: IDatafeed = new Datafeed(this)
   public widget?: IChart.IChartingLibraryWidget
   public klineData: Array<IChart.Bar> = []
+  public isDebug: boolean = false
+  public symbol = 'BTCUSD'
+  public interval = '5'
+  public pricescale = 100
 
   /**
    * 返回配置
@@ -24,7 +31,12 @@ class MainMixin extends Vue {
    * 返回商品
    */
   public returnSymbol(): IChart.LibrarySymbolInfo {
-    return {}
+    return {
+      name: this.symbol,
+      ticker: this.symbol,
+      description: this.symbol,
+      pricescale: this.pricescale
+    }
   }
 
   /**
@@ -61,36 +73,29 @@ class MainMixin extends Vue {
    */
   public returnOptions() {
     return {
-      debug: true,
       locale: 'en',
       preset: 'mobile',
       fullscreen: true,
-      symbol: 'btcusdt',
       library_path: './',
-      container_id: 'trade',
+      container_id: 'app',
+      symbol: this.symbol,
+      debug: this.isDebug,
+      overrides: overrides,
+      interval: this.interval,
       datafeed: this.datafeed,
       timezone: 'Asia/Shanghai',
-      overrides: overrides,
       enabled_features: enabled,
       disabled_features: disabled,
-      interval: '5',
-      studies_overrides: {
-        'MA Cross.short:plot.color': '#f103f2',
-        'MA Cross.long:plot.color': '#fff900',
-        'MA Cross.crosses:plot.color': '#f00',
-        'MA Cross.crosses:plot.linewidth': 0,
-        'volume.volume.color.0': 'rgba(234,0,112,0.6)',
-        'volume.volume.color.1': 'rgba(112,168,0,0.6)'
-      },
-      MA_Cross_style: {
-        'short:plot.color': '#f103f2',
-        'long:plot.color': '#fff900'
-      },
-      volume_style: {
-        'volume.color.0': 'rgba(234,0,112,0.6)',
-        'volume.color.1': 'rgba(112,168,0,0.6)'
-      }
+      studies_overrides: options.studies,
+      MA_Cross_style: options.cross,
+      volume_style: options.volume
     }
+  }
+  /**
+   * 发送消息
+   */
+  public postMessage(message: string) {
+    window.postMessage(JSON.stringify(message), '*')
   }
 }
 

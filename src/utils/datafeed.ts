@@ -24,14 +24,14 @@ export default class Datafeed {
    */
   public defaultConfig() {
     return {
+      exchanges: [],
+      symbols_types: [],
+      supports_time: true,
+      supports_marks: true,
       supports_search: false,
       supports_group_request: false,
-      supported_resolutions: ['1', '5', '15', '30', '60', 'D'],
-      supports_marks: true,
       supports_timescale_marks: true,
-      supports_time: true,
-      exchanges: [],
-      symbols_types: []
+      supported_resolutions: ['1', '5', '15', '30', '60', 'D']
     }
   }
 
@@ -76,20 +76,19 @@ export default class Datafeed {
    * 默认商品配置
    */
   public defaultSymbol() {
-    const resolutions = this.config ? this.config.supported_resolutions : []
+    let resolutions: Array<any> | undefined = []
+    if (this.config) {
+      resolutions = this.config.supported_resolutions
+    }
     return {
       minmov: 1,
       minmov2: 0,
       pointvalue: 1,
       session: '24x7',
-      name: 'btcusdt',
-      ticker: 'btcusdt',
       fractional: false,
       has_intraday: true,
       has_no_volume: false,
-      description: 'btcusdt',
       timezone: 'Asia/Shanghai',
-      pricescale: 100,
       supported_resolutions: resolutions,
       intraday_multipliers: ['1', '5', '60']
     }
@@ -200,13 +199,6 @@ export default class Datafeed {
   unsubscribeBars(subscriberUID: string) {
     this.barsPulseUpdater.unsubscribeDataListener(subscriberUID)
     this.debugLog('Datafeed unsubscribeBars done.', subscriberUID)
-  }
-
-  /**
-   * name
-   */
-  public crossHairMoved(aaa: any) {
-    console.log('--------', 'crossHairMoved', aaa)
   }
 }
 

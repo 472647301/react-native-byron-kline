@@ -1,5 +1,3 @@
-/// <reference types="jquery" />
-
 /**
  * This is the generic type useful for declaring a nominal type,
  * which does not structurally matches with the base type and
@@ -384,7 +382,7 @@ export declare type SupportedLineTools =
   | 'brush'
 export declare type TableElementFormatFunction = (
   inputs: TableFormatterInputs
-) => string | JQuery
+) => string
 export declare type TextInputFieldValidator = (
   value: string
 ) => InputFieldValidatorResult
@@ -447,7 +445,7 @@ export interface AccountManagerInfo {
   pages: AccountManagerPage[]
   possibleOrderStatuses?: OrderStatus[]
   contextMenuActions?(
-    contextMenuEvent: JQueryEventObject,
+    contextMenuEvent: any,
     activePageActions: ActionMetaInfo[]
   ): Promise<ActionMetaInfo[]>
 }
@@ -1729,7 +1727,7 @@ export interface TableFormatterInputs {
   value: number | string | Side | OrderType | OrderStatus
   prevValue?: number | undefined
   row: TableRow
-  $container: JQuery
+  $container: any
   priceFormatter?: IFormatter
 }
 export interface TableRow {
