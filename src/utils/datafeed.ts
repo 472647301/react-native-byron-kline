@@ -1,4 +1,4 @@
-import App from '../App'
+import App from '../mixins'
 import * as IChart from '../types/chart.min'
 import { IDataPulse } from './datapulse'
 import DataPulse from './datapulse'
@@ -146,13 +146,7 @@ export default class Datafeed {
           this.lastBarEndTime[key] || 0
         )
       }
-      const aaa:any[] = []
-      bars.forEach((item, index) => {
-        if (index < 200) {
-          aaa.push(item)
-        }
-      })
-      this.debugLog('Datafeed bars length ', JSON.stringify(aaa))
+      this.debugLog('Datafeed bars length ', bars.length)
       onResult(bars, meta)
     }
     this.app.getBars(
@@ -211,7 +205,7 @@ export default class Datafeed {
   /**
    * name
    */
-  public crossHairMoved(aaa:any) {
+  public crossHairMoved(aaa: any) {
     console.log('--------', 'crossHairMoved', aaa)
   }
 }
