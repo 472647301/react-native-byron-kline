@@ -52,19 +52,51 @@ class MainMixin extends Vue {
     isFirstCall: boolean,
     isSubscribe: boolean
   ) {
-    if (isFirstCall && this.klineData.length) {
+    const data = this.klineData
+    const toMs = rangeEndDate * 1000
+    const fromMs = rangeStartDate * 1000
+    if (isFirstCall && data.length) {
       console.warn(' >> 已有历史数据渲染.')
-      onResult(this.klineData, { noData: false })
+      onResult(data, { noData: false })
       return
     }
-    if (isFirstCall && !this.klineData.length) {
+    if (isFirstCall && !data.length) {
       console.warn(' >> 请求历史数据渲染.')
+      const message = {
+        event: 'fetchHistoryData',
+        data: {
+          to: rangeEndDate,
+          from: rangeStartDate,
+          resolution: resolution,
+          symbol: this.symbol
+        }
+      }
+      this.postMessage(JSON.stringify(message))
     }
     if (!isFirstCall && isSubscribe) {
       console.warn(' >> 订阅实时数据渲染.')
     }
     if (!isFirstCall && !isSubscribe) {
       console.warn(' >> 请求更多数据渲染.')
+      if (data && data.length) {
+        const firstBar = data[0]
+        if (
+          (firstBar.time < toMs && fromMs < firstBar.time) ||
+          firstBar.time > toMs
+        ) {
+          rangeEndDate = Math.floor(firstBar.time / 1000)
+        }
+      }
+      const message = {
+        event: 'fetchMoreData',
+        data: {
+          to: rangeEndDate,
+          from: rangeStartDate,
+          resolution: resolution,
+          symbol: this.symbol
+        }
+      }
+      this.postMessage(JSON.stringify(message))
     }
   }
 
