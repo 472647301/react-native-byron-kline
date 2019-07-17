@@ -194,8 +194,8 @@ class App extends React.Component {
       console.info(' >> tradingview onready.')
       this.widget = new window.TradingView.widget(this.returnOptions())
       this.urlParamsInit()
-      await this.appendScript('./bundles/vendors.js')
-      await this.appendScript('./bundles/library.js')
+      await this.appendScript('./bundles/vendors.min.js')
+      await this.appendScript('./bundles/library.min.js')
     })
   }
 

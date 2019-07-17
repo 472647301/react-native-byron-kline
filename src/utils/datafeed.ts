@@ -146,7 +146,13 @@ export default class Datafeed {
           this.lastBarEndTime[key] || 0
         )
       }
-      this.debugLog('Datafeed bars length ', bars.length)
+      const aaa:any[] = []
+      bars.forEach((item, index) => {
+        if (index < 200) {
+          aaa.push(item)
+        }
+      })
+      this.debugLog('Datafeed bars length ', JSON.stringify(aaa))
       onResult(bars, meta)
     }
     this.app.getBars(

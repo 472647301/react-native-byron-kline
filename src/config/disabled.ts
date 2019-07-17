@@ -20,6 +20,7 @@ export default [
   'legend_context_menu',
   'volume_force_overlay',
   'context_menus',
-  'source_selection_markers'
+  'source_selection_markers',
+  'chart_zoom'
   // 'create_volume_indicator_by_default' // 隐藏成交量
 ]
