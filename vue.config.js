@@ -1,15 +1,17 @@
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin')
+
 module.exports = {
-  publicPath: './',
-  // outputDir: '../chart',
+  // publicPath: './',
+  outputDir: './html/dist',
   productionSourceMap: false,
-  devServer: {
-    open: true,
-    proxy: {
-      '/api': {
-        target: 'https://tl.tdex.com',
-        ws: true,
-        changeOrigin: true
-      }
-    }
+  configureWebpack: {
+    plugins: [
+      new HtmlWebpackPlugin({
+        inlineSource: '.(js|css)$',
+        template: './public/index.html'
+      }),
+      new HtmlWebpackInlineSourcePlugin() // 实例化内联资源插件
+    ]
   }
 }

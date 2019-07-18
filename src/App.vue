@@ -19,18 +19,6 @@ declare global {
   }
 })
 class App extends mixins(MainMixin) {
-  // 加载脚本
-  public appendScript(src: string) {
-    return new Promise(resolve => {
-      const script = document.createElement('script')
-      script.src = src
-      document.head.appendChild(script)
-      script.onload = function() {
-        resolve()
-        console.info(` >> ${src} 加载成功`)
-      }
-    })
-  }
   /**
    * urlParamsInit
    */
@@ -72,15 +60,15 @@ class App extends mixins(MainMixin) {
       console.info(' >> tradingview onready.')
       this.widget = new window.TradingView.widget(this.returnOptions())
       this.urlParamsInit()
-      await this.appendScript('./script/vendors.min.js')
-      await this.appendScript('./script/library.min.js')
+      require('./script/vendors.min.js')
+      require('./script/library.min.js')
     })
   }
   /**
    * 接收消息
    */
   public receiveMessage(event: any) {
-    const info = JSON.parse(event.data)
+    const info = JSON.parse(event)
     const data = info.data
     switch (info.event) {
       case 'chartInit': // 图表初始化
@@ -88,11 +76,32 @@ class App extends mixins(MainMixin) {
         this.interval = data.interval || '5'
         this.isDebug = data.isDebug || false
         this.pricescale = data.pricescale || 100
+        if (data.isDebug) {
+          const VConsole = require('vconsole')
+          const vsonsole = new VConsole()
+        }
         this.chartInit()
+        break
+      case 'postChartData': // 发送图表数据
+        if (data && data.length) {
+          data.sort((l: any, r: any) => (l.time > r.time ? 1 : -1))
+          data.forEach((element: any) => {
+            this.klineData.push(element)
+          })
+        }
+        break
+      case 'changeChartType': // 改变图表类型
+        break
+      case 'createChartStudy': // 创建图表指标
+        break
+      case 'updateChartStudy': // 更新图表指标
+        break
+      case 'changeChartResolution': // 改变图表周期
         break
     }
   }
   public created() {
+    window.receiveMessage = this.receiveMessage.bind(this)
     document.addEventListener('message', this.receiveMessage.bind(this))
   }
 }

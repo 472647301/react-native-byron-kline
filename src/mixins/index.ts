@@ -16,19 +16,20 @@ class MainMixin extends Vue {
   public widget?: IChart.IChartingLibraryWidget
   public klineData: Array<IChart.Bar> = []
   public isDebug: boolean = false
-  public symbol = 'BTCUSD'
+  public symbol = 'BTC'
   public interval = '5'
   public pricescale = 100
+  public awaitCount = 0
 
   /**
-   * 返回配置
+   * 返回datafeed配置
    */
   public returnConfig(): IChart.DatafeedConfiguration {
     return {}
   }
 
   /**
-   * 返回商品
+   * 返回商品配置
    */
   public returnSymbol(): IChart.LibrarySymbolInfo {
     return {
@@ -40,9 +41,9 @@ class MainMixin extends Vue {
   }
 
   /**
-   * getBars
+   * 渲染k线数据
    */
-  public getBars(
+  public async getBars(
     symbolInfo: IChart.LibrarySymbolInfo,
     resolution: IChart.ResolutionString,
     rangeStartDate: number,
@@ -55,6 +56,25 @@ class MainMixin extends Vue {
     const data = this.klineData
     const toMs = rangeEndDate * 1000
     const fromMs = rangeStartDate * 1000
+    if (this.interval !== resolution) {
+      console.warn(' >> 图表周期切换.')
+      const notice = {
+        event: 'switchingCycle',
+        data: { old: this.interval, new: resolution }
+      }
+      this.interval = resolution
+      this.postMessage(JSON.stringify(notice))
+      this.fetchHistoryData(rangeEndDate, rangeStartDate)
+      this.klineData = []
+      const newData = await this.delayAwait()
+      this.awaitCount = 0
+      if (newData && newData.length) {
+        onResult(newData, { noData: false })
+      } else {
+        onResult([], { noData: true })
+      }
+      return
+    }
     if (isFirstCall && data.length) {
       console.warn(' >> 已有历史数据渲染.')
       onResult(data, { noData: false })
@@ -62,19 +82,21 @@ class MainMixin extends Vue {
     }
     if (isFirstCall && !data.length) {
       console.warn(' >> 请求历史数据渲染.')
-      const message = {
-        event: 'fetchHistoryData',
-        data: {
-          to: rangeEndDate,
-          from: rangeStartDate,
-          resolution: resolution,
-          symbol: this.symbol
-        }
+      this.fetchHistoryData(rangeEndDate, rangeStartDate)
+      const newData = await this.delayAwait()
+      this.awaitCount = 0
+      if (newData && newData.length) {
+        onResult(newData, { noData: false })
+        this.postMessage(JSON.stringify({ event: 'closeLoading' }))
+      } else {
+        onResult([], { noData: true })
       }
-      this.postMessage(JSON.stringify(message))
+      return
     }
     if (!isFirstCall && isSubscribe) {
       console.warn(' >> 订阅实时数据渲染.')
+      onResult(data, { noData: false })
+      return
     }
     if (!isFirstCall && !isSubscribe) {
       console.warn(' >> 请求更多数据渲染.')
@@ -97,7 +119,30 @@ class MainMixin extends Vue {
         }
       }
       this.postMessage(JSON.stringify(message))
+      const newData = await this.delayAwait()
+      this.awaitCount = 0
+      if (newData && newData.length) {
+        onResult(newData, { noData: false })
+      } else {
+        onResult([], { noData: true })
+      }
     }
+  }
+
+  /**
+   * 请求历史数据
+   */
+  public fetchHistoryData(to: number, from: number) {
+    const message = {
+      event: 'fetchHistoryData',
+      data: {
+        to: to,
+        from: from,
+        symbol: this.symbol,
+        resolution: this.interval
+      }
+    }
+    this.postMessage(JSON.stringify(message))
   }
 
   /**
@@ -127,7 +172,29 @@ class MainMixin extends Vue {
    * 发送消息
    */
   public postMessage(message: string) {
-    window.postMessage(JSON.stringify(message), '*')
+    console.warn(' >> 发送数据给RN:', message)
+    const _w: any = window
+    if (_w.ReactNativeWebView) {
+      _w.ReactNativeWebView.postMessage(message)
+    }
+  }
+  /**
+   * name
+   */
+  public delayAwait(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.awaitCount++
+      console.warn(` >> Await count: ${this.awaitCount * 300}ms`)
+      if (this.klineData.length) {
+        return resolve(this.klineData)
+      } else {
+        return this.awaitCount < 100 ? reject() : resolve()
+      }
+    }).catch(() => {
+      return new Promise(resolve => {
+        setTimeout(resolve, 300)
+      }).then(() => this.delayAwait())
+    })
   }
 }
 

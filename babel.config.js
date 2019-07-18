@@ -1,5 +1,4 @@
 module.exports = {
-  presets: [
-    '@vue/app'
-  ]
+  compact: false,
+  presets: ['@vue/app']
 }
