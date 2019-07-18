@@ -20,6 +20,7 @@ class MainMixin extends Vue {
   public interval = '5'
   public pricescale = 100
   public awaitCount = 0
+  public studyList: any = {}
 
   /**
    * 返回datafeed配置
@@ -41,7 +42,7 @@ class MainMixin extends Vue {
   }
 
   /**
-   * 渲染k线数据
+   * 返回k线数据给图表
    */
   public async getBars(
     symbolInfo: IChart.LibrarySymbolInfo,
@@ -57,7 +58,7 @@ class MainMixin extends Vue {
     const toMs = rangeEndDate * 1000
     const fromMs = rangeStartDate * 1000
     if (this.interval !== resolution) {
-      console.warn(' >> 图表周期切换.')
+      console.info(' >> 图表周期切换.')
       const notice = {
         event: 'switchingCycle',
         data: { old: this.interval, new: resolution }
@@ -76,12 +77,12 @@ class MainMixin extends Vue {
       return
     }
     if (isFirstCall && data.length) {
-      console.warn(' >> 已有历史数据渲染.')
+      console.info(' >> 已有历史数据渲染.')
       onResult(data, { noData: false })
       return
     }
     if (isFirstCall && !data.length) {
-      console.warn(' >> 请求历史数据渲染.')
+      console.info(' >> 请求历史数据渲染.')
       this.fetchHistoryData(rangeEndDate, rangeStartDate)
       const newData = await this.delayAwait()
       this.awaitCount = 0
@@ -94,12 +95,12 @@ class MainMixin extends Vue {
       return
     }
     if (!isFirstCall && isSubscribe) {
-      console.warn(' >> 订阅实时数据渲染.')
+      console.info(' >> 订阅实时数据渲染.')
       onResult(data, { noData: false })
       return
     }
     if (!isFirstCall && !isSubscribe) {
-      console.warn(' >> 请求更多数据渲染.')
+      console.info(' >> 请求更多数据渲染.')
       if (data && data.length) {
         const firstBar = data[0]
         if (
@@ -172,19 +173,22 @@ class MainMixin extends Vue {
    * 发送消息
    */
   public postMessage(message: string) {
-    console.warn(' >> 发送数据给RN:', message)
+    console.info(' >> 发送数据给RN:', message)
+    if (typeof message !== 'string') {
+      message = JSON.stringify(message)
+    }
     const _w: any = window
     if (_w.ReactNativeWebView) {
       _w.ReactNativeWebView.postMessage(message)
     }
   }
   /**
-   * name
+   * 异步延迟等待
    */
   public delayAwait(): Promise<any> {
     return new Promise((resolve, reject) => {
       this.awaitCount++
-      console.warn(` >> Await count: ${this.awaitCount * 300}ms`)
+      console.info(` >> Await count: ${this.awaitCount * 300}ms`)
       if (this.klineData.length) {
         return resolve(this.klineData)
       } else {
@@ -195,6 +199,17 @@ class MainMixin extends Vue {
         setTimeout(resolve, 300)
       }).then(() => this.delayAwait())
     })
+  }
+  /**
+   * 遍历k线数据
+   */
+  forEachKlineData(list: Array<IChart.Bar>) {
+    const newList = []
+    for (let i = 0; i < list.length; i++) {
+      newList.push(list[i])
+    }
+    newList.sort((l, r) => (l.time > r.time ? 1 : -1))
+    return newList
   }
 }
 

@@ -54,7 +54,7 @@ class App extends mixins(MainMixin) {
   /**
    *  初始化图表
    */
-  public chartInit() {
+  public initializationChart() {
     console.info(' >> Initialization chart.')
     window.TradingView.onready(async () => {
       console.info(' >> tradingview onready.')
@@ -67,11 +67,18 @@ class App extends mixins(MainMixin) {
   /**
    * 接收消息
    */
-  public receiveMessage(event: any) {
-    const info = JSON.parse(event)
-    const data = info.data
-    switch (info.event) {
-      case 'chartInit': // 图表初始化
+  public receiveMessage(message: any) {
+    console.info(` >> Receive message:`, message)
+    if (!message || !message.event || !message.data) {
+      return
+    }
+    if (typeof message === 'string') {
+      this.postMessage(`[Data type error]:${message}`)
+      return
+    }
+    const data = message.data
+    switch (message.event) {
+      case 'initChart': // 图表初始化
         this.symbol = data.symbol || 'BTC'
         this.interval = data.interval || '5'
         this.isDebug = data.isDebug || false
@@ -79,30 +86,63 @@ class App extends mixins(MainMixin) {
         if (data.isDebug) {
           const VConsole = require('vconsole')
           const vsonsole = new VConsole()
+          this.datafeed.isDebug = true
+          console.info(` >> init data:`, message)
         }
-        this.chartInit()
+        this.initializationChart()
         break
-      case 'postChartData': // 发送图表数据
+      case 'renderChartData': // 渲染图表历史数据
         if (data && data.length) {
-          data.sort((l: any, r: any) => (l.time > r.time ? 1 : -1))
-          data.forEach((element: any) => {
-            this.klineData.push(element)
-          })
+          this.klineData = this.forEachKlineData(data)
+        }
+        break
+      case 'renderChartSub': // 渲染图表订阅数据
+        if (data && data.length) {
+          this.klineData = this.forEachKlineData(data)
+          this.datafeed.barsPulseUpdater.update()
         }
         break
       case 'changeChartType': // 改变图表类型
+        if (data.type && this.widget) {
+          const chart = this.widget.chart()
+          chart.setChartType(data.type)
+        }
         break
       case 'createChartStudy': // 创建图表指标
+        if (data.studyName && this.widget) {
+          const name = data.studyName
+          const value = data.studyValue || []
+          const chart = this.widget.chart()
+          this.studyList[name] = chart.createStudy(name, false, false, value)
+        }
         break
       case 'updateChartStudy': // 更新图表指标
+        if (data.studyName && this.widget) {
+          const name = data.studyName
+          const value = data.studyValue || []
+          const chart = this.widget.chart()
+          if (this.studyList[name]) {
+            const study = chart.getStudyById(this.studyList[name])
+            const oldValue = study.getInputValues()
+            if (study.isUserEditEnabled()) {
+              oldValue[0].value = Number(value[0] || 0)
+              oldValue[1].value = Number(value[1] || 0)
+              study.setInputValues(oldValue)
+              console.info(' >> Update study success:', oldValue)
+            }
+          }
+        }
         break
       case 'changeChartResolution': // 改变图表周期
+        if (data.interval && this.widget) {
+          const chart = this.widget.chart()
+          chart.setResolution(data.interval, function() {})
+        }
         break
     }
   }
   public created() {
-    window.receiveMessage = this.receiveMessage.bind(this)
-    document.addEventListener('message', this.receiveMessage.bind(this))
+    window.sendMessageHtml = this.receiveMessage.bind(this)
   }
 }
 export default App
