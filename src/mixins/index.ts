@@ -8,13 +8,13 @@ import * as IChart from '../types/chart.min'
 import overrides from '../config/overrides'
 import disabled from '../config/disabled'
 
-// const data = require('../data')
+const data = require('../data')
 
 @Component
 class MainMixin extends Vue {
   public datafeed: IDatafeed = new Datafeed(this)
   public widget?: IChart.IChartingLibraryWidget
-  public klineData: Array<IChart.Bar> = []
+  public klineData: Array<IChart.Bar> = data
   public isDebug: boolean = false
   public symbol = 'BTC'
   public interval = '5'

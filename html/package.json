@@ -1,6 +1,6 @@
 {
   "name": "react-native-kline",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "main": "lib/index.js",
   "description": "react-native-kline",
   "scripts": {
