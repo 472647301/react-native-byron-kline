@@ -204,12 +204,46 @@ class MainMixin extends Vue {
    * 遍历k线数据
    */
   forEachKlineData(list: Array<IChart.Bar>) {
-    const newList = []
-    for (let i = 0; i < list.length; i++) {
-      newList.push(list[i])
+    const newCacheList = []
+    const cacheData = this.klineData
+    let ci = 0
+    let lastTime = 0
+    let cl = cacheData.length
+    for (let i = list.length - 1; i >= 0; i--) {
+      const item = list[i]
+      if (item.time < lastTime) continue
+      while (ci < cl) {
+        const cItem = cacheData[ci]
+        if (cItem.time > item.time) {
+          break
+        } else if (cItem.time < item.time) {
+          lastTime = cItem.time
+          newCacheList.push(cItem)
+          ci++
+        } else {
+          ci++
+          break
+        }
+      }
+      if (item.time > lastTime) {
+        lastTime = item.time
+        newCacheList.push(item)
+      } else {
+        newCacheList[newCacheList.length - 1] = item
+      }
+      if (i === 0) {
+        while (ci < cl) {
+          const cItem = cacheData[ci]
+          if (cItem.time > lastTime) {
+            lastTime = cItem.time
+            newCacheList.push(cItem)
+            ci++
+          }
+        }
+      }
     }
-    newList.sort((l, r) => (l.time > r.time ? 1 : -1))
-    return newList
+    newCacheList.sort((l, r) => (l.time > r.time ? 1 : -1))
+    return newCacheList
   }
 }
 

@@ -1,6 +1,7 @@
 {
   "name": "react-native-kline",
-  "version": "1.0.4",
+  "version": "1.0.5",
+  "main": "index.js",
   "description": "react-native-kline",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

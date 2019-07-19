@@ -92,13 +92,18 @@ class App extends mixins(MainMixin) {
         this.initializationChart()
         break
       case 'renderChartData': // 渲染图表历史数据
-        if (data && data.length) {
-          this.klineData = this.forEachKlineData(data)
+        if (data.kline && data.kline.length) {
+          const newList = []
+          for (let i = 0; i < data.kline.length; i++) {
+            newList.push(data.kline[i])
+          }
+          newList.sort((l, r) => (l.time > r.time ? 1 : -1))
+          this.klineData = newList
         }
         break
       case 'renderChartSub': // 渲染图表订阅数据
-        if (data && data.length) {
-          this.klineData = this.forEachKlineData(data)
+        if (data.kline && data.kline.length) {
+          this.klineData = this.forEachKlineData(data.kline)
           this.datafeed.barsPulseUpdater.update()
         }
         break
