@@ -16,7 +16,6 @@ export default class Datafeed {
     this.lastBarEndTime = {}
     this.barsPulseUpdater = new DataPulse(this)
     this.isDebug = false
-    this.initialize()
   }
 
   /**

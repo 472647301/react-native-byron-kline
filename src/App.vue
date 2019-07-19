@@ -5,6 +5,7 @@
 <script lang="ts">
 import MainMixin from './mixins'
 import Component, { mixins } from 'vue-class-component'
+import Datafeed from './utils/datafeed'
 
 // 全局对象
 declare global {
@@ -83,12 +84,22 @@ class App extends mixins(MainMixin) {
         this.interval = data.interval || '5'
         this.isDebug = data.isDebug || false
         this.pricescale = data.pricescale || 100
+        if (data.datafeedConfig) {
+          this.datafeedConfig = data.datafeedConfig
+        }
+        if (data.optionsConfig) {
+          this.optionsConfig = data.optionsConfig
+        }
+        if (data.symbolConfig) {
+          this.symbolConfig = data.symbolConfig
+        }
         if (data.isDebug) {
           const VConsole = require('vconsole')
           const vsonsole = new VConsole()
           this.datafeed.isDebug = true
           console.info(` >> init data:`, message)
         }
+        this.datafeed.initialize()
         this.initializationChart()
         break
       case 'renderChartData': // 渲染图表历史数据

@@ -21,24 +21,33 @@ class MainMixin extends Vue {
   public pricescale = 100
   public awaitCount = 0
   public studyList: any = {}
+  public datafeedConfig?: IChart.DatafeedConfiguration
+  public symbolConfig?: IChart.LibrarySymbolInfo
+  public optionsConfig?: IChart.ChartingLibraryWidgetOptions
 
   /**
    * 返回datafeed配置
    */
   public returnConfig(): IChart.DatafeedConfiguration {
-    return {}
+    const config = {}
+    const _config = this.datafeedConfig
+    return _config ? Object.assign(config, _config) : config
   }
 
   /**
    * 返回商品配置
    */
   public returnSymbol(): IChart.LibrarySymbolInfo {
-    return {
+    const _config = {
       name: this.symbol,
       ticker: this.symbol,
       description: this.symbol,
-      pricescale: this.pricescale
+      pricescale: this.pricescale,
+      volume_precision: 1,
+      has_empty_bars: true
     }
+    const config = this.symbolConfig
+    return config ? Object.assign(_config, config) : _config
   }
 
   /**
@@ -150,7 +159,7 @@ class MainMixin extends Vue {
    * 返回初始化配置
    */
   public returnOptions() {
-    return {
+    const _config = {
       locale: 'en',
       preset: 'mobile',
       fullscreen: true,
@@ -168,6 +177,8 @@ class MainMixin extends Vue {
       MA_Cross_style: options.cross,
       volume_style: options.volume
     }
+    const config = this.optionsConfig
+    return config ? Object.assign(_config, config) : _config
   }
   /**
    * 发送消息
