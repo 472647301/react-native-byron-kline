@@ -16,7 +16,6 @@ type _params = {
   studyName?: string
   studyValue?: Array<number>
 }
-export type ISendMessageHtml = (name: _event, params: _params) => void
 
 export interface Bar {
   time: number
@@ -44,4 +43,13 @@ type __data = {
 export interface IOnMessage {
   event: __event
   data: __data
+}
+
+export function sendMessageHtml(name: _event, params: _params) {
+  return `
+  window.sendMessageHtml(${JSON.stringify({
+    event: name,
+    data: params
+  })})
+  `
 }
