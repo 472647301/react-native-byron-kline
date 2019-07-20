@@ -1,29 +1,10 @@
-# vue-kline
+# react-native-kline
 
-## Project setup
-```
-yarn install
-```
+基于TradingView的 react-native k线图表
 
-### Compiles and hot-reloads for development
-```
-yarn run serve
-```
+- [TradingView api](https://b.aitrade.ga/books/tradingview/)
+- [Example](https://github.com/472647301/react-native-inssues/blob/master/src/views/WebView.tsx)
 
-### Compiles and minifies for production
-```
-yarn run build
-```
-
-### Run your tests
-```
-yarn run test
-```
-
-### Lints and fixes files
-```
-yarn run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+![kline_view](https://github.com/472647301/react-native-inssues/blob/master/screenshots/kline_view.jpg?raw=true)
+![kline_ide_1](https://github.com/472647301/react-native-inssues/blob/master/screenshots/kline_ide_1.jpg?raw=true)
+![kline_ide_2](https://github.com/472647301/react-native-inssues/blob/master/screenshots/kline_ide_2.jpg?raw=true)
