@@ -1,4 +1,4 @@
-# react-native-kline
+# react-native-byron-kline
 
 基于TradingView的 react-native k线图表
 

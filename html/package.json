@@ -1,25 +1,25 @@
 {
-  "name": "react-native-kline",
+  "name": "react-native-byron-kline",
   "version": "1.0.9",
   "main": "lib/index.js",
-  "description": "react-native-kline",
+  "description": "react-native-byron-kline",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/472647301/react-native-kline.git"
+    "url": "git+https://github.com/472647301/react-native-byron-kline.git"
   },
   "keywords": [
-    "react-native-kline"
+    "react-native-byron-kline"
   ],
   "author": "Byron ZHU <472647301@qq.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/472647301/react-native-kline/issues"
+    "url": "https://github.com/472647301/react-native-byron-kline/issues"
   },
-  "homepage": "https://github.com/472647301/react-native-kline#readme",
+  "homepage": "https://github.com/472647301/react-native-byron-kline#readme",
   "devDependencies": {
     "typescript": "^3.5.3"
   }
