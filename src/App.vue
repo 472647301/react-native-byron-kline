@@ -110,11 +110,13 @@ class App extends mixins(MainMixin) {
           }
           newList.sort((l, r) => (l.time > r.time ? 1 : -1))
           this.klineData = newList
+          this.moreData = newList
         }
         break
       case 'renderChartSub': // 渲染图表订阅数据
         if (data.kline && data.kline.length) {
           this.klineData = this.forEachKlineData(data.kline)
+          this.moreData = data.kline
           this.datafeed.barsPulseUpdater.update()
         }
         break
