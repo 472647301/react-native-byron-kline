@@ -1,6 +1,22 @@
 <template>
-  <div id="app"></div>
+  <div id="app">
+    <div id="tradingview"></div>
+    <div :class="isLoadingHistory || isLoadingMoer ? 'loading' : ''"></div>
+  </div>
 </template>
+
+<style>
+.loading {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 150;
+  background: rgba(0, 0, 0, 0.3);
+}
+</style>
+
 
 <script lang="ts">
 import MainMixin from './mixins'
@@ -110,13 +126,13 @@ class App extends mixins(MainMixin) {
           }
           newList.sort((l, r) => (l.time > r.time ? 1 : -1))
           this.klineData = newList
-          this.moreData = newList
+          this.isLoadingHistory = false
         }
         break
       case 'renderChartSub': // 渲染图表订阅数据
-        if (data.kline && data.kline.length) {
+        if (data.kline && data.kline.length && this.klineData.length) {
           this.klineData = this.forEachKlineData(data.kline)
-          this.moreData = data.kline
+          this.isLoadingMoer = false
           this.datafeed.barsPulseUpdater.update()
         }
         break

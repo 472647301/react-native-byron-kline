@@ -8,14 +8,15 @@ import * as IChart from '../types/chart.min'
 import overrides from '../config/overrides'
 import disabled from '../config/disabled'
 
-const data = require('../data')
+// const data = require('../data')
 
 @Component
 class MainMixin extends Vue {
   public datafeed: IDatafeed = new Datafeed(this)
   public widget?: IChart.IChartingLibraryWidget
-  public klineData: Array<IChart.Bar> = data
-  public moreData: Array<IChart.Bar> = []
+  public klineData: Array<IChart.Bar> = []
+  public isLoadingMoer: boolean = false
+  public isLoadingHistory: boolean = false
   public isDebug: boolean = false
   public symbol = 'BTC'
   public interval = '5'
@@ -93,8 +94,8 @@ class MainMixin extends Vue {
     }
     if (isFirstCall && !data.length && !this.awaitCount) {
       console.info(' >> 请求历史数据渲染.')
-      this.moreData = []
       this.fetchHistoryData(rangeEndDate, rangeStartDate)
+      this.isLoadingHistory = true
       const newData = await this.delayAwait()
       this.awaitCount = 0
       if (newData && newData.length) {
@@ -112,7 +113,6 @@ class MainMixin extends Vue {
     }
     if (!isFirstCall && !isSubscribe && !this.awaitCount) {
       console.info(' >> 请求更多数据渲染.')
-      this.moreData = []
       if (data && data.length) {
         const firstBar = data[0]
         if (
@@ -132,6 +132,7 @@ class MainMixin extends Vue {
         }
       }
       this.postMessage(JSON.stringify(message))
+      this.isLoadingMoer = true
       const newData = await this.delayAwait()
       this.awaitCount = 0
       if (newData && newData.length) {
@@ -167,7 +168,6 @@ class MainMixin extends Vue {
       preset: 'mobile',
       fullscreen: true,
       library_path: './',
-      container_id: 'app',
       symbol: this.symbol,
       debug: this.isDebug,
       overrides: overrides,
@@ -176,6 +176,7 @@ class MainMixin extends Vue {
       timezone: 'Asia/Shanghai',
       enabled_features: enabled,
       disabled_features: disabled,
+      container_id: 'tradingview',
       studies_overrides: options.studies,
       MA_Cross_style: options.cross,
       volume_style: options.volume
@@ -203,7 +204,7 @@ class MainMixin extends Vue {
     return new Promise((resolve, reject) => {
       this.awaitCount++
       console.info(` >> Await count: ${this.awaitCount * 300}ms`)
-      if (this.moreData.length) {
+      if (!this.isLoadingHistory && !this.isLoadingMoer) {
         return resolve(this.klineData)
       } else {
         return this.awaitCount < 100 ? reject() : resolve()
