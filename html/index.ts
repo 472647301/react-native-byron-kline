@@ -1,6 +1,7 @@
 type _event =
   | 'initChart'
   | 'renderChartData'
+  | 'renderChartMoreData'
   | 'renderChartSub'
   | 'changeChartType'
   | 'createChartStudy'

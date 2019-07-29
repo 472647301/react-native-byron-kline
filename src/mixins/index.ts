@@ -8,8 +8,6 @@ import * as IChart from '../types/chart.min'
 import overrides from '../config/overrides'
 import disabled from '../config/disabled'
 
-// const data = require('../data')
-
 @Component
 class MainMixin extends Vue {
   public datafeed: IDatafeed = new Datafeed(this)
@@ -78,6 +76,7 @@ class MainMixin extends Vue {
       this.postMessage(JSON.stringify(notice))
       this.fetchHistoryData(rangeEndDate, rangeStartDate)
       this.klineData = []
+      this.isLoadingHistory = true
       const newData = await this.delayAwait()
       this.awaitCount = 0
       if (newData && newData.length) {
@@ -220,45 +219,39 @@ class MainMixin extends Vue {
    */
   forEachKlineData(list: Array<IChart.Bar>) {
     const newCacheList = []
-    const cacheData = this.klineData
-    let ci = 0
-    let lastTime = 0
-    let cl = cacheData.length
-    for (let i = list.length - 1; i >= 0; i--) {
-      const item = list[i]
-      if (item.time < lastTime) continue
-      while (ci < cl) {
-        const cItem = cacheData[ci]
-        if (cItem.time > item.time) {
-          break
-        } else if (cItem.time < item.time) {
-          lastTime = cItem.time
-          newCacheList.push(cItem)
-          ci++
-        } else {
-          ci++
-          break
-        }
-      }
-      if (item.time > lastTime) {
-        lastTime = item.time
-        newCacheList.push(item)
-      } else {
-        newCacheList[newCacheList.length - 1] = item
-      }
-      if (i === 0) {
-        while (ci < cl) {
-          const cItem = cacheData[ci]
-          if (cItem.time > lastTime) {
-            lastTime = cItem.time
-            newCacheList.push(cItem)
-            ci++
-          }
-        }
-      }
+    for (let i = 0; i < list.length; i++) {
+      newCacheList.push(list[i])
     }
     newCacheList.sort((l, r) => (l.time > r.time ? 1 : -1))
+    // 请求断线时间段的历史数据
+    // if (this.klineData.length) {
+    //   const lastTime = this.klineData[this.klineData.length - 1].time
+    //   const _lastTime = newCacheList[newCacheList.length - 1].time
+    //   const seconCount = this.conversionSecon() * 1000
+    //   console.info(' >> Last time:', lastTime, _lastTime, _lastTime - lastTime)
+    //   if (_lastTime - lastTime > seconCount * 2) {
+    //     // 请求更多数据
+    //   }
+    // }
+    // 暂时不考虑
     return newCacheList
+  }
+
+  /**
+   *  周期转换秒
+   */
+  public conversionSecon() {
+    let seconCount = 0
+    if (this.interval === 'D') {
+      seconCount = 60 * 60 * 24
+    } else if (this.interval === 'M') {
+      seconCount = 60 * 60 * 24 * 31
+    } else if (this.interval === 'W') {
+      seconCount = 60 * 60 * 24 * 7
+    } else {
+      seconCount = 60 * Number(this.interval)
+    }
+    return seconCount
   }
 }
 

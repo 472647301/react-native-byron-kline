@@ -23,6 +23,8 @@ import MainMixin from './mixins'
 import Component, { mixins } from 'vue-class-component'
 import Datafeed from './utils/datafeed'
 
+// import native from './native'
+
 // 全局对象
 declare global {
   interface Window {
@@ -120,19 +122,19 @@ class App extends mixins(MainMixin) {
         break
       case 'renderChartData': // 渲染图表历史数据
         if (data.kline && data.kline.length) {
-          const newList = []
-          for (let i = 0; i < data.kline.length; i++) {
-            newList.push(data.kline[i])
-          }
-          newList.sort((l, r) => (l.time > r.time ? 1 : -1))
-          this.klineData = newList
+          this.klineData = this.forEachKlineData(data.kline)
           this.isLoadingHistory = false
         }
         break
-      case 'renderChartSub': // 渲染图表订阅数据
-        if (data.kline && data.kline.length && this.klineData.length) {
+      case 'renderChartMoreData': // 渲染图表更多数据
+        if (data.kline && data.kline.length) {
           this.klineData = this.forEachKlineData(data.kline)
           this.isLoadingMoer = false
+        }
+        break
+      case 'renderChartSub': // 渲染图表订阅数据
+        if (data.kline && data.kline.length && !this.isLoadingHistory) {
+          this.klineData = this.forEachKlineData(data.kline)
           this.datafeed.barsPulseUpdater.update()
         }
         break
@@ -179,6 +181,8 @@ class App extends mixins(MainMixin) {
   }
   public created() {
     window.sendMessageHtml = this.receiveMessage.bind(this)
+    // native.sendMessageHtml = window.sendMessageHtml
+    // window.ReactNativeWebView = native
   }
 }
 export default App

@@ -1,4 +1,4 @@
-declare type _event = 'initChart' | 'renderChartData' | 'renderChartSub' | 'changeChartType' | 'createChartStudy' | 'updateChartStudy' | 'changeChartResolution';
+declare type _event = 'initChart' | 'renderChartData' | 'renderChartMoreData' | 'renderChartSub' | 'changeChartType' | 'createChartStudy' | 'updateChartStudy' | 'changeChartResolution';
 declare type _params = {
     symbol?: string;
     interval?: string;

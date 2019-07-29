@@ -17,6 +17,7 @@
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
+  "http.proxyStrictSSL": false,
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",

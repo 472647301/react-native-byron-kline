@@ -13,5 +13,13 @@ module.exports = {
       }),
       new HtmlWebpackInlineSourcePlugin() // 实例化内联资源插件
     ]
+  },
+  devServer: {
+    open: true,
+    proxy: {
+      '/v1': {
+        target: 'https://wapi.bituan.cc'
+      }
+    }
   }
 }
