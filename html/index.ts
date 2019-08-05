@@ -7,6 +7,14 @@ type _event =
   | 'createChartStudy'
   | 'updateChartStudy'
   | 'changeChartResolution'
+  | 'chart'
+  | 'setLanguage'
+  | 'setSymbol'
+  | 'remove'
+  | 'save'
+  | 'load'
+  | 'symbolInterval'
+  | 'changeTheme'
 type _params = {
   symbol?: string
   interval?: string
@@ -19,6 +27,8 @@ type _params = {
   symbolConfig?: LibrarySymbolInfo
   optionsConfig?: ChartingLibraryWidgetOptions
   datafeedConfig?: DatafeedConfiguration
+  event?: string
+  data?: any
 }
 export interface DatafeedConfiguration {
   exchanges?: Exchange[]
@@ -242,23 +252,13 @@ type __data = {
   symbol?: string
 }
 
-type IChartingLibraryWidget =
-  | 'chart'
-  | 'setLanguage'
-  | 'setSymbol'
-  | 'remove'
-  | 'save'
-  | 'load'
-  | 'symbolInterval'
-  | 'changeTheme'
-
 export interface IOnMessage {
   event: __event
   data: __data
 }
 
 export function sendMessageHtml(
-  name: _event & IChartingLibraryWidget,
+  name: _event,
   params: _params
 ) {
   return `

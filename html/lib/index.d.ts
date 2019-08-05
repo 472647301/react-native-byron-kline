@@ -1,4 +1,4 @@
-declare type _event = 'initChart' | 'renderChartData' | 'renderChartMoreData' | 'renderChartSub' | 'changeChartType' | 'createChartStudy' | 'updateChartStudy' | 'changeChartResolution';
+declare type _event = 'initChart' | 'renderChartData' | 'renderChartMoreData' | 'renderChartSub' | 'changeChartType' | 'createChartStudy' | 'updateChartStudy' | 'changeChartResolution' | 'chart' | 'setLanguage' | 'setSymbol' | 'remove' | 'save' | 'load' | 'symbolInterval' | 'changeTheme';
 declare type _params = {
     symbol?: string;
     interval?: string;
@@ -11,6 +11,8 @@ declare type _params = {
     symbolConfig?: LibrarySymbolInfo;
     optionsConfig?: ChartingLibraryWidgetOptions;
     datafeedConfig?: DatafeedConfiguration;
+    event?: string;
+    data?: any;
 };
 export interface DatafeedConfiguration {
     exchanges?: Exchange[];
@@ -155,10 +157,9 @@ declare type __data = {
     resolution?: string;
     symbol?: string;
 };
-declare type IChartingLibraryWidget = 'chart' | 'setLanguage' | 'setSymbol' | 'remove' | 'save' | 'load' | 'symbolInterval' | 'changeTheme';
 export interface IOnMessage {
     event: __event;
     data: __data;
 }
-export declare function sendMessageHtml(name: _event & IChartingLibraryWidget, params: _params): string;
+export declare function sendMessageHtml(name: _event, params: _params): string;
 export {};

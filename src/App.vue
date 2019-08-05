@@ -181,10 +181,9 @@ class App extends mixins(MainMixin) {
         if (this.widget && (this.widget as any)[message.event]) {
           const widget = this.widget as any
           const data = message.data
-          if (data.event && widget[message.event](data)[data.event]) {
-            widget[message.event](data)[data.event](data.data)
-          } else {
-            widget[message.event](data)
+          const __widget = widget[message.event]()
+          if (data.event && __widget[data.event]) {
+            __widget[data.event](data.data)
           }
         }
         break
