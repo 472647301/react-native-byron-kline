@@ -155,9 +155,10 @@ declare type __data = {
     resolution?: string;
     symbol?: string;
 };
+declare type IChartingLibraryWidget = 'chart' | 'setLanguage' | 'setSymbol' | 'remove' | 'save' | 'load' | 'symbolInterval' | 'changeTheme';
 export interface IOnMessage {
     event: __event;
     data: __data;
 }
-export declare function sendMessageHtml(name: _event, params: _params): string;
+export declare function sendMessageHtml(name: _event & IChartingLibraryWidget, params: _params): string;
 export {};

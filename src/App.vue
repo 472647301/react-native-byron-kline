@@ -177,6 +177,17 @@ class App extends mixins(MainMixin) {
           chart.setResolution(data.interval, function() {})
         }
         break
+      default:
+        if (this.widget && (this.widget as any)[message.event]) {
+          const widget = this.widget as any
+          const data = message.data
+          if (data.event && widget[message.event](data)[data.event]) {
+            widget[message.event](data)[data.event](data.data)
+          } else {
+            widget[message.event](data)
+          }
+        }
+        break
     }
   }
   public created() {

@@ -242,12 +242,25 @@ type __data = {
   symbol?: string
 }
 
+type IChartingLibraryWidget =
+  | 'chart'
+  | 'setLanguage'
+  | 'setSymbol'
+  | 'remove'
+  | 'save'
+  | 'load'
+  | 'symbolInterval'
+  | 'changeTheme'
+
 export interface IOnMessage {
   event: __event
   data: __data
 }
 
-export function sendMessageHtml(name: _event, params: _params) {
+export function sendMessageHtml(
+  name: _event & IChartingLibraryWidget,
+  params: _params
+) {
   return `
   window.sendMessageHtml(${JSON.stringify({
     event: name,
