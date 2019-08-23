@@ -150,12 +150,12 @@ export interface Bar {
 }
 declare type __event = 'fetchHistoryData' | 'fetchMoreData' | 'closeLoading' | 'switchingCycle';
 declare type __data = {
-    old?: string;
-    new?: string;
-    to?: number;
-    from?: number;
-    resolution?: string;
-    symbol?: string;
+    old: string;
+    new: string;
+    to: number;
+    from: number;
+    resolution: string;
+    symbol: string;
 };
 export interface IOnMessage {
     event: __event;
