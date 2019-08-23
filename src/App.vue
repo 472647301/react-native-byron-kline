@@ -81,6 +81,16 @@ class App extends mixins(MainMixin) {
       this.urlParamsInit()
       require('./script/vendors.min.js')
       require('./script/library.min.js')
+      const message = {
+        event: 'initDone',
+        data: {
+          to: 0,
+          from: 0,
+          resolution: this.interval,
+          symbol: this.symbol
+        }
+      }
+      this.postMessage(JSON.stringify(message))
     })
   }
   /**

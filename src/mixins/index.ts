@@ -82,6 +82,7 @@ class MainMixin extends Vue {
       if (newData && newData.length) {
         onResult(newData, { noData: false })
       } else {
+        this.isLoadingHistory = false
         onResult([], { noData: true })
       }
       return
@@ -101,6 +102,7 @@ class MainMixin extends Vue {
         onResult(newData, { noData: false })
         this.postMessage(JSON.stringify({ event: 'closeLoading' }))
       } else {
+        this.isLoadingHistory = false
         onResult([], { noData: true })
       }
       return
@@ -112,6 +114,10 @@ class MainMixin extends Vue {
     }
     if (!isFirstCall && !isSubscribe && !this.awaitCount) {
       console.info(' >> 请求更多数据渲染.')
+      if (this.isLoadingMoer) {
+        //  正在请求中
+        return
+      }
       if (data && data.length) {
         const firstBar = data[0]
         if (
@@ -137,6 +143,7 @@ class MainMixin extends Vue {
       if (newData && newData.length) {
         onResult(newData, { noData: false })
       } else {
+        this.isLoadingMoer = false
         onResult([], { noData: true })
       }
     }

@@ -243,6 +243,7 @@ type __event =
   | 'fetchMoreData'
   | 'closeLoading'
   | 'switchingCycle'
+  | 'initDone'
 type __data = {
   old: string
   new: string

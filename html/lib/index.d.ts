@@ -148,7 +148,7 @@ export interface Bar {
     close: number;
     volume?: number;
 }
-declare type __event = 'fetchHistoryData' | 'fetchMoreData' | 'closeLoading' | 'switchingCycle';
+declare type __event = 'fetchHistoryData' | 'fetchMoreData' | 'closeLoading' | 'switchingCycle' | 'initDone';
 declare type __data = {
     old: string;
     new: string;
