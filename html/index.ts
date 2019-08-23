@@ -244,12 +244,12 @@ type __event =
   | 'closeLoading'
   | 'switchingCycle'
 type __data = {
-  old?: string
-  new?: string
-  to?: number
-  from?: number
-  resolution?: string
-  symbol?: string
+  old: string
+  new: string
+  to: number
+  from: number
+  resolution: string
+  symbol: string
 }
 
 export interface IOnMessage {
