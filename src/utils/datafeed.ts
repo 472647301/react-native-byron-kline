@@ -30,7 +30,7 @@ export default class Datafeed {
       supports_search: false,
       supports_group_request: false,
       supports_timescale_marks: true,
-      supported_resolutions: ['1', '5', '15', '30', '60', 'D']
+      supported_resolutions: ['1', '5', '15', '30', '60', 'D', 'W', 'M']
     }
   }
 
@@ -89,7 +89,7 @@ export default class Datafeed {
       has_no_volume: false,
       timezone: 'Asia/Shanghai',
       supported_resolutions: resolutions,
-      intraday_multipliers: ['1', '5', '60']
+      intraday_multipliers: ['1', '5', '15', '30', '60', 'D', 'W', 'M']
     }
   }
 
