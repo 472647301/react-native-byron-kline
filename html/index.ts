@@ -29,6 +29,8 @@ type _params = {
   datafeedConfig?: DatafeedConfiguration
   event?: string
   data?: any
+  studyPlot?: any
+  [key: string]: any
 }
 export interface DatafeedConfiguration {
   exchanges?: Exchange[]
@@ -251,6 +253,7 @@ type __data = {
   from: number
   resolution: string
   symbol: string
+  [key: string]: any
 }
 
 export interface IOnMessage {
@@ -258,10 +261,7 @@ export interface IOnMessage {
   data: __data
 }
 
-export function sendMessageHtml(
-  name: _event,
-  params: _params
-) {
+export function sendMessageHtml(name: _event, params: _params) {
   return `
   window.sendMessageHtml(${JSON.stringify({
     event: name,

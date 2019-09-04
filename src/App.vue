@@ -159,9 +159,9 @@ class App extends mixins(MainMixin) {
           const name = data.studyName
           const value = data.studyValue || []
           const chart = this.widget.chart()
-          this.studyList[name] = chart.createStudy(name, false, false, value)
-          const minbtn = document.querySelector('.pane-legend-minbtn')
-          if (minbtn) (minbtn as any).click()
+          this.studyList[name] = chart.createStudy(name, false, false, value, undefined, data.studyPlot)
+          // const minbtn = document.querySelector('.pane-legend-minbtn')
+          // if (minbtn) (minbtn as any).click()
         }
         break
       case 'updateChartStudy': // 更新图表指标

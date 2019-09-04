@@ -13,6 +13,8 @@ declare type _params = {
     datafeedConfig?: DatafeedConfiguration;
     event?: string;
     data?: any;
+    studyPlot?: any;
+    [key: string]: any;
 };
 export interface DatafeedConfiguration {
     exchanges?: Exchange[];
@@ -156,6 +158,7 @@ declare type __data = {
     from: number;
     resolution: string;
     symbol: string;
+    [key: string]: any;
 };
 export interface IOnMessage {
     event: __event;
