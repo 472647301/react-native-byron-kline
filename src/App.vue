@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div id="tradingview"></div>
-    <div :class="isLoadingHistory || isLoadingMoer ? 'loading' : ''"></div>
+    <!-- <div :class="isLoadingHistory || isLoadingMoer ? 'loading' : ''"></div> -->
   </div>
 </template>
 
