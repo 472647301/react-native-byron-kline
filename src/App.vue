@@ -131,19 +131,15 @@ class App extends mixins(MainMixin) {
         this.initializationChart()
         break
       case 'renderChartData': // 渲染图表历史数据
-        if (data.kline && data.kline.length) {
-          this.klineData = this.forEachKlineData(data.kline)
-          this.isLoadingHistory = false
-        }
+        this.klineData = this.forEachKlineData(data.kline || [])
+        this.isLoading = false
         break
       case 'renderChartMoreData': // 渲染图表更多数据
-        if (data.kline && data.kline.length) {
-          this.klineData = this.forEachKlineData(data.kline)
-          this.isLoadingMoer = false
-        }
+        this.klineData = this.forEachKlineData(data.kline || [])
+        this.isLoading = false
         break
       case 'renderChartSub': // 渲染图表订阅数据
-        if (data.kline && data.kline.length && !this.isLoadingHistory) {
+        if (data.kline && data.kline.length && !this.isLoading) {
           this.klineData = this.forEachKlineData(data.kline)
           this.datafeed.barsPulseUpdater.update()
         }
@@ -159,7 +155,14 @@ class App extends mixins(MainMixin) {
           const name = data.studyName
           const value = data.studyValue || []
           const chart = this.widget.chart()
-          this.studyList[name] = chart.createStudy(name, false, false, value, undefined, data.studyPlot)
+          this.studyList[name] = chart.createStudy(
+            name,
+            false,
+            false,
+            value,
+            undefined,
+            data.studyPlot
+          )
           // const minbtn = document.querySelector('.pane-legend-minbtn')
           // if (minbtn) (minbtn as any).click()
         }

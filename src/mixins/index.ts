@@ -13,8 +13,7 @@ class MainMixin extends Vue {
   public datafeed: IDatafeed = new Datafeed(this)
   public widget?: IChart.IChartingLibraryWidget
   public klineData: Array<IChart.Bar> = []
-  public isLoadingMoer: boolean = false
-  public isLoadingHistory: boolean = false
+  public isLoading: boolean = false
   public isDebug: boolean = false
   public symbol = 'BTC'
   public interval = '5'
@@ -58,7 +57,7 @@ class MainMixin extends Vue {
     resolution: IChart.ResolutionString,
     rangeStartDate: number,
     rangeEndDate: number,
-    onResult: IChart.HistoryCallback,
+    onResult: (bars: IChart.Bar[]) => void,
     onError: IChart.ErrorCallback,
     isFirstCall: boolean,
     isSubscribe: boolean
@@ -76,45 +75,35 @@ class MainMixin extends Vue {
       this.postMessage(JSON.stringify(notice))
       this.fetchHistoryData(rangeEndDate, rangeStartDate)
       this.klineData = []
-      this.isLoadingHistory = true
+      this.isLoading = true
       const newData = await this.delayAwait()
       this.awaitCount = 0
-      if (newData && newData.length) {
-        onResult(newData, { noData: false })
-      } else {
-        this.isLoadingHistory = false
-        onResult([], { noData: true })
-      }
+      onResult(newData)
       return
     }
     if (isFirstCall && data.length) {
       console.info(' >> 已有历史数据渲染.')
-      onResult(data, { noData: false })
+      onResult(data)
       return
     }
     if (isFirstCall && !data.length && !this.awaitCount) {
       console.info(' >> 请求历史数据渲染.')
       this.fetchHistoryData(rangeEndDate, rangeStartDate)
-      this.isLoadingHistory = true
+      this.isLoading = true
       const newData = await this.delayAwait()
       this.awaitCount = 0
-      if (newData && newData.length) {
-        onResult(newData, { noData: false })
-        this.postMessage(JSON.stringify({ event: 'closeLoading' }))
-      } else {
-        this.isLoadingHistory = false
-        onResult([], { noData: true })
-      }
+      onResult(newData)
+      this.postMessage(JSON.stringify({ event: 'closeLoading' }))
       return
     }
     if (!isFirstCall && isSubscribe) {
       console.info(' >> 订阅实时数据渲染.')
-      onResult(data, { noData: false })
+      onResult(data)
       return
     }
     if (!isFirstCall && !isSubscribe && !this.awaitCount) {
       console.info(' >> 请求更多数据渲染.')
-      if (this.isLoadingMoer) {
+      if (this.isLoading) {
         //  正在请求中
         return
       }
@@ -137,15 +126,10 @@ class MainMixin extends Vue {
         }
       }
       this.postMessage(JSON.stringify(message))
-      this.isLoadingMoer = true
+      this.isLoading = true
       const newData = await this.delayAwait()
       this.awaitCount = 0
-      if (newData && newData.length) {
-        onResult(newData, { noData: false })
-      } else {
-        this.isLoadingMoer = false
-        onResult([], { noData: true })
-      }
+      onResult(newData)
     }
   }
 
@@ -210,7 +194,7 @@ class MainMixin extends Vue {
     return new Promise((resolve, reject) => {
       this.awaitCount++
       console.info(` >> Await count: ${this.awaitCount * 300}ms`)
-      if (!this.isLoadingHistory && !this.isLoadingMoer) {
+      if (!this.isLoading) {
         return resolve(this.klineData)
       } else {
         return this.awaitCount < 100 ? reject() : resolve()

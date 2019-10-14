@@ -133,10 +133,7 @@ export default class Datafeed {
     isFirstCall: boolean,
     isSubscribe: boolean
   ) {
-    const onLoadedCallback = (
-      bars: IChart.Bar[],
-      meta: IChart.HistoryMetadata
-    ) => {
+    const onLoadedCallback = (bars: IChart.Bar[]) => {
       if (bars.length && isFirstCall) {
         const key = `${symbolInfo.ticker}_${resolution}`
         this.lastBarEndTime[key] = Math.max(
@@ -145,7 +142,7 @@ export default class Datafeed {
         )
       }
       this.debugLog('Datafeed bars length ', bars.length)
-      onResult(bars, meta)
+      onResult(bars, { noData: !bars.length })
     }
     this.app.getBars(
       symbolInfo,
