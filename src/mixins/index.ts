@@ -23,6 +23,7 @@ class MainMixin extends Vue {
   public datafeedConfig?: IChart.DatafeedConfiguration
   public symbolConfig?: IChart.LibrarySymbolInfo
   public optionsConfig?: IChart.ChartingLibraryWidgetOptions
+  public imageUrl = ''
 
   /**
    * 返回datafeed配置

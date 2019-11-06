@@ -1,36 +1,28 @@
 <template>
   <div id="app">
     <div id="tradingview"></div>
-    <!-- <div :class="isLoadingHistory || isLoadingMoer ? 'loading' : ''"></div> -->
+    <img @click="imageUrl = ''" v-if="imageUrl" :src="imageUrl" alt class="image" />
   </div>
 </template>
 
 <style>
-.loading {
+.image {
   width: 100%;
   height: 100%;
   position: absolute;
   top: 0;
   left: 0;
   z-index: 150;
-  background: rgba(0, 0, 0, 0.3);
 }
 </style>
-
 
 <script lang="ts">
 import MainMixin from './mixins'
 import Component, { mixins } from 'vue-class-component'
 import Datafeed from './utils/datafeed'
+import html2canvas from 'html2canvas'
 
 // import native from './native'
-
-// 全局对象
-declare global {
-  interface Window {
-    [key: string]: any
-  }
-}
 
 @Component({
   components: {
@@ -163,8 +155,6 @@ class App extends mixins(MainMixin) {
             undefined,
             data.studyPlot
           )
-          // const minbtn = document.querySelector('.pane-legend-minbtn')
-          // if (minbtn) (minbtn as any).click()
         }
         break
       case 'updateChartStudy': // 更新图表指标
@@ -190,6 +180,31 @@ class App extends mixins(MainMixin) {
           chart.setResolution(data.interval, function() {})
         }
         break
+      case 'createScreenShot':
+        const width = window.innerWidth // 获取dom 宽度
+        const height = window.innerHeight // 获取dom 高度
+        const canvas = document.createElement('canvas') // 创建一个canvas节点
+        const scale = 2 // 定义任意放大倍数 支持小数
+        canvas.width = width * scale // 定义canvas 宽度 * 缩放
+        canvas.height = height * scale // 定义canvas高度 *缩放
+        canvas.getContext('2d') // 获取context
+        html2canvas(document.body, {
+          scale: scale, // 添加的scale 参数
+          canvas: canvas, // 自定义 canvas
+          // logging: true, // 日志开关，便于查看html2canvas的内部执行流程
+          width: width, // dom 原始宽度
+          height: height,
+          useCORS: true // 【重要】开启跨域配置
+        }).then(canvas => {
+          const context = canvas.getContext('2d')
+          this.imageUrl = canvas.toDataURL('image/png')
+          this.postMessage(JSON.stringify({ event: 'createScreenShotDone' }))
+        })
+        break
+      case 'deleteScreenShot':
+        this.imageUrl = ''
+        this.postMessage(JSON.stringify({ event: 'deleteScreenShotDone' }))
+        break
       default:
         if (this.widget && (this.widget as any)[message.event]) {
           const widget = this.widget as any
@@ -204,9 +219,17 @@ class App extends mixins(MainMixin) {
   }
   public created() {
     window.sendMessageHtml = this.receiveMessage.bind(this)
-    // native.sendMessageHtml = window.sendMessageHtml
-    // window.ReactNativeWebView = native
   }
 }
 export default App
+
+// 全局对象
+declare global {
+  interface Window {
+    TradingView: any
+    zhuwenbo: any
+    urlParams: any
+    sendMessageHtml: any
+  }
+}
 </script>
