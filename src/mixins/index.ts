@@ -131,6 +131,7 @@ class MainMixin extends Vue {
       const newData = await this.delayAwait()
       this.awaitCount = 0
       onResult(newData)
+      this.postMessage(JSON.stringify({ event: 'closeLoading' }))
     }
   }
 

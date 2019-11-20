@@ -177,7 +177,17 @@ class App extends mixins(MainMixin) {
       case 'changeChartResolution': // 改变图表周期
         if (data.interval && this.widget) {
           const chart = this.widget.chart()
+          const to = parseInt((Date.now() / 1000).toString()) - 30
+          const from =
+            to -
+            this.datafeed.barsPulseUpdater.periodLengthSeconds(
+              data.interval,
+              10
+            )
           chart.setResolution(data.interval, function() {})
+          chart.setVisibleRange({ to: to, from: from }, () => {
+            console.info(' >> setVisibleRange:', to, from)
+          })
         }
         break
       case 'createScreenShot':
