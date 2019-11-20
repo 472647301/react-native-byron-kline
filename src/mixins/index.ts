@@ -13,7 +13,6 @@ class MainMixin extends Vue {
   public datafeed: IDatafeed = new Datafeed(this)
   public widget?: IChart.IChartingLibraryWidget
   public klineData: Array<IChart.Bar> = []
-  public isLoading: boolean = false
   public isDebug: boolean = false
   public symbol = 'BTC'
   public interval = '5'
@@ -24,6 +23,7 @@ class MainMixin extends Vue {
   public symbolConfig?: IChart.LibrarySymbolInfo
   public optionsConfig?: IChart.ChartingLibraryWidgetOptions
   public imageUrl = ''
+  public status: IStatus = 0
 
   /**
    * 返回datafeed配置
@@ -76,36 +76,43 @@ class MainMixin extends Vue {
       this.postMessage(JSON.stringify(notice))
       this.fetchHistoryData(rangeEndDate, rangeStartDate)
       this.klineData = []
-      this.isLoading = true
+      this.status = IStatus.REQUEST
       const newData = await this.delayAwait()
       this.awaitCount = 0
       onResult(newData)
+      this.status = IStatus.RENDER
+      this.postMessage(JSON.stringify({ event: 'closeLoading' }))
       return
     }
     if (isFirstCall && data.length) {
       console.info(' >> 已有历史数据渲染.')
       onResult(data)
+      this.status = IStatus.RENDER
+      this.postMessage(JSON.stringify({ event: 'closeLoading' }))
       return
     }
     if (isFirstCall && !data.length && !this.awaitCount) {
       console.info(' >> 请求历史数据渲染.')
       this.fetchHistoryData(rangeEndDate, rangeStartDate)
-      this.isLoading = true
+      this.status = IStatus.REQUEST
       const newData = await this.delayAwait()
       this.awaitCount = 0
       onResult(newData)
+      this.status = IStatus.RENDER
       this.postMessage(JSON.stringify({ event: 'closeLoading' }))
       return
     }
     if (!isFirstCall && isSubscribe) {
       console.info(' >> 订阅实时数据渲染.')
       onResult(data)
+      this.status = IStatus.RENDER
       return
     }
     if (!isFirstCall && !isSubscribe && !this.awaitCount) {
       console.info(' >> 请求更多数据渲染.')
-      if (this.isLoading) {
+      if (this.status === IStatus.REQUEST) {
         //  正在请求中
+        console.info(' >> 正在请求更多数据渲染.')
         return
       }
       if (data && data.length) {
@@ -127,10 +134,11 @@ class MainMixin extends Vue {
         }
       }
       this.postMessage(JSON.stringify(message))
-      this.isLoading = true
+      this.status = IStatus.REQUEST
       const newData = await this.delayAwait()
       this.awaitCount = 0
       onResult(newData)
+      this.status = IStatus.RENDER
       this.postMessage(JSON.stringify({ event: 'closeLoading' }))
     }
   }
@@ -196,7 +204,7 @@ class MainMixin extends Vue {
     return new Promise((resolve, reject) => {
       this.awaitCount++
       console.info(` >> Await count: ${this.awaitCount * 300}ms`)
-      if (!this.isLoading) {
+      if (this.status === IStatus.RECEIVE) {
         return resolve(this.klineData)
       } else {
         return this.awaitCount < 100 ? reject() : resolve()
@@ -249,3 +257,9 @@ class MainMixin extends Vue {
 }
 
 export default MainMixin
+
+export enum IStatus {
+  REQUEST, // 请求
+  RECEIVE, // 接收
+  RENDER // 渲染
+}

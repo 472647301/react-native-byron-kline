@@ -17,7 +17,7 @@
 </style>
 
 <script lang="ts">
-import MainMixin from './mixins'
+import MainMixin, { IStatus } from './mixins'
 import Component, { mixins } from 'vue-class-component'
 import Datafeed from './utils/datafeed'
 import html2canvas from 'html2canvas'
@@ -122,16 +122,16 @@ class App extends mixins(MainMixin) {
         this.datafeed.initialize()
         this.initializationChart()
         break
-      case 'renderChartData': // 渲染图表历史数据
+      case 'renderChartData': // 接收图表历史数据
         this.klineData = this.forEachKlineData(data.kline || [])
-        this.isLoading = false
+        this.status = IStatus.RECEIVE
         break
-      case 'renderChartMoreData': // 渲染图表更多数据
+      case 'renderChartMoreData': // 接收图表更多数据
         this.klineData = this.forEachKlineData(data.kline || [])
-        this.isLoading = false
+        this.status = IStatus.RECEIVE
         break
-      case 'renderChartSub': // 渲染图表订阅数据
-        if (data.kline && data.kline.length && !this.isLoading) {
+      case 'renderChartSub': // 接收图表订阅数据
+        if (data.kline && data.kline.length && this.status === IStatus.RENDER) {
           this.klineData = this.forEachKlineData(data.kline)
           this.datafeed.barsPulseUpdater.update()
         }
@@ -177,17 +177,19 @@ class App extends mixins(MainMixin) {
       case 'changeChartResolution': // 改变图表周期
         if (data.interval && this.widget) {
           const chart = this.widget.chart()
-          const to = parseInt((Date.now() / 1000).toString()) - 30
-          const from =
-            to -
-            this.datafeed.barsPulseUpdater.periodLengthSeconds(
-              data.interval,
-              10
-            )
+          // const to = parseInt((Date.now() / 1000).toString()) - 30
+          // const from =
+          //   to -
+          //   this.datafeed.barsPulseUpdater.periodLengthSeconds(
+          //     data.interval,
+          //     10
+          //   )
           chart.setResolution(data.interval, function() {})
-          chart.setVisibleRange({ to: to, from: from }, () => {
-            console.info(' >> setVisibleRange:', to, from)
-          })
+          // const _r = chart.getVisibleRange()
+          // console.warn(' >> setVisibleRange:', to, from, _r)
+          // chart.setVisibleRange({ to: to, from: from }, () => {
+          //   console.info(' >> setVisibleRange:', to, from, _r)
+          // })
         }
         break
       case 'createScreenShot':

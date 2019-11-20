@@ -21,6 +21,6 @@ export default [
   'volume_force_overlay',
   'context_menus',
   'source_selection_markers',
-  'chart_zoom'
+  // 'chart_zoom'
   // 'create_volume_indicator_by_default' // 隐藏成交量
 ]
