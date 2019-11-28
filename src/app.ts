@@ -1,0 +1,416 @@
+import Vue from 'vue'
+import Component from 'vue-class-component'
+import { TradingView, Datafeed } from 'trader-view'
+import { IChartingLibraryWidget, IDatafeed } from 'trader-view'
+import { DatafeedConfiguration, LibrarySymbolInfo } from 'trader-view'
+import { ChartingLibraryWidgetOptions } from 'trader-view'
+import { Bar, LanguageCode } from 'trader-view'
+import html2canvas from 'html2canvas'
+import * as CONFIG from './config'
+import vconsole from 'vconsole'
+
+@Component
+class KlineChart extends Vue {
+  public widget?: IChartingLibraryWidget
+  public datafeed?: IDatafeed
+  public klineData: Bar[] = []
+  public symbol = 'BTC/USDT'
+  public interval = '15'
+  public awaitCount = 0
+  public isAwait = true
+  public locale: LanguageCode = 'zh'
+  public debug = false
+  public device: IDevice = 'rn'
+  public pricescale = 100
+  public studyList: IStudy = {}
+  public datafeedConfiguration?: DatafeedConfiguration
+  public librarySymbolInfo?: LibrarySymbolInfo
+  public chartingLibraryWidgetOptions?: ChartingLibraryWidgetOptions
+  public imageUrl = ''
+
+  /**
+   * 发送消息给原生
+   */
+  public sendMessageToNative(info: string) {
+    switch (this.device) {
+      case 'rn':
+        if (window.ReactNativeWebView) {
+          window.ReactNativeWebView.postMessage(info)
+        }
+        break
+      case 'ios':
+        break
+      case 'android':
+        break
+    }
+  }
+
+  /**
+   * 接收原生通知
+   */
+  public receiveNativeNotification(msg: IMsg) {
+    const data = msg.data || {}
+    switch (msg.event) {
+      case IEvents.INIT: // 图表初始化
+        if (data.symbol) {
+          this.symbol = data.symbol
+        }
+        if (data.interval) {
+          this.interval = data.interval
+        }
+        if (data.debug) {
+          this.debug = data.debug
+          const v = new vconsole()
+        }
+        if (data.locale) {
+          this.locale = data.locale
+        }
+        if (data.pricescale) {
+          this.pricescale = data.pricescale
+        }
+        if (data.librarySymbolInfo) {
+          this.librarySymbolInfo = data.librarySymbolInfo
+        }
+        if (data.datafeedConfiguration) {
+          this.datafeedConfiguration = data.datafeedConfiguration
+        }
+        if (data.chartingLibraryWidgetOptions) {
+          this.chartingLibraryWidgetOptions = data.chartingLibraryWidgetOptions
+        }
+        this.initDatafeed()
+        this.initTradingView()
+        const _info = JSON.stringify({
+          status: true,
+          event: IEvents.INIT
+        })
+        this.sendMessageToNative(_info)
+        break
+      case IEvents.HISTORY: // 图表历史
+        if (data.kline) {
+          this.klineData = data.kline
+          this.isAwait = false
+          const _msg = JSON.stringify({
+            status: true,
+            event: IEvents.HISTORY
+          })
+          this.sendMessageToNative(_msg)
+        }
+        break
+      case IEvents.SUBSCRIBE: // 图表订阅
+        if (data.kline && !this.isAwait && this.datafeed) {
+          this.datafeed.updateData({
+            bars: data.kline,
+            meta: { noData: !data.kline.length }
+          })
+          const _msg = JSON.stringify({
+            status: true,
+            event: IEvents.SUBSCRIBE
+          })
+          this.sendMessageToNative(_msg)
+        }
+        break
+      case IEvents.TYPE: // 图表类型
+        if (data.type && this.widget) {
+          this.widget.chart().setChartType(data.type)
+          const _msg = JSON.stringify({
+            status: true,
+            event: IEvents.TYPE
+          })
+          this.sendMessageToNative(_msg)
+        }
+        break
+      case IEvents.STUDY: // 图表指标
+        if (data.studyName && this.widget) {
+          const name = data.studyName
+          const value = data.studyValue || []
+          const chart = this.widget.chart()
+          if (data.studyId && this.studyList[data.studyId]) {
+            const study = chart.getStudyById(this.studyList[data.studyId])
+            const oldValue = study.getInputValues()
+            if (study.isUserEditEnabled()) {
+              oldValue[0].value = Number(value[0] || 0)
+              oldValue[1].value = Number(value[1] || 0)
+              study.setInputValues(oldValue)
+              console.info(' >> Update study success:', oldValue)
+              const _msg = JSON.stringify({
+                status: true,
+                event: IEvents.STUDY,
+                type: 'update'
+              })
+              this.sendMessageToNative(_msg)
+            }
+          } else {
+            chart.createStudy(
+              name,
+              false,
+              false,
+              value,
+              undefined,
+              data.studyPlot
+            ).then(v => {
+              if (data.studyId && v) {
+                this.studyList[data.studyId] = v
+              }
+              const _msg = JSON.stringify({
+                status: true,
+                event: IEvents.STUDY,
+                type: 'create'
+              })
+              this.sendMessageToNative(_msg)
+            })
+          }
+        }
+        break
+      case IEvents.INTERVAL: // 图表周期
+        if (data.interval && this.widget) {
+          const chart = this.widget.chart()
+          chart.setResolution(data.interval, () => {
+            const _msg = JSON.stringify({
+              status: true,
+              event: IEvents.INTERVAL
+            })
+            this.sendMessageToNative(_msg)
+          })
+        }
+        break
+      case IEvents.CREATE_SHOT:
+        const width = window.innerWidth // 获取dom 宽度
+        const height = window.innerHeight // 获取dom 高度
+        const canvas = document.createElement('canvas') // 创建一个canvas节点
+        const scale = 2 // 定义任意放大倍数 支持小数
+        canvas.width = width * scale // 定义canvas 宽度 * 缩放
+        canvas.height = height * scale // 定义canvas高度 *缩放
+        canvas.getContext('2d') // 获取context
+        html2canvas(document.body, {
+          scale: scale, // 添加的scale 参数
+          canvas: canvas, // 自定义 canvas
+          logging: this.debug, // 日志开关，便于查看html2canvas的内部执行流程
+          width: width, // dom 原始宽度
+          height: height,
+          useCORS: true // 【重要】开启跨域配置
+        }).then(canvas => {
+          this.imageUrl = canvas.toDataURL('image/png')
+          const _msg = JSON.stringify({
+            status: true,
+            event: IEvents.CREATE_SHOT
+          })
+          this.sendMessageToNative(_msg)
+        })
+        break
+      case IEvents.REMOVE_SHOT:
+        this.imageUrl = ''
+        const _msg = JSON.stringify({
+          status: true,
+          event: IEvents.REMOVE_SHOT
+        })
+        this.sendMessageToNative(_msg)
+        break
+      default:
+        if (this.widget) {
+          const data = msg.data
+          const widget = this.widget as IWidget
+          const _widget = widget[msg.event] ? widget[msg.event]() : {}
+          if (_widget && _widget[data.event]) {
+            _widget[data.event](data.data)
+          }
+        }
+        break
+    }
+  }
+
+  /**
+   * 异步延迟等待
+   */
+  public delayAwait(): Promise<IDelayAwait> {
+    return new Promise((resolve, reject) => {
+      this.awaitCount++
+      console.info(`>> Await count: ${this.awaitCount * 300}ms`)
+      if (!this.isAwait) {
+        return resolve(this.klineData)
+      } else {
+        return this.awaitCount < 100 ? reject() : resolve()
+      }
+    }).catch(() => {
+      return new Promise(resolve => {
+        setTimeout(resolve, 300)
+      }).then(() => this.delayAwait())
+    })
+  }
+
+  /**
+   * 初始化 JS API
+   */
+  public initDatafeed() {
+    const symbol = this.symbol.toLocaleUpperCase()
+    const _config = {
+      supports_search: true,
+      supports_group_request: false,
+      supported_resolutions: ['1', '5', '15', '30', '60', 'D', 'W', 'M'],
+      supports_marks: false,
+      supports_timescale_marks: false,
+      supports_time: false
+    }
+    const _symbols = {
+      name: symbol,
+      full_name: symbol,
+      description: symbol,
+      type: symbol,
+      session: '24x7',
+      exchange: symbol,
+      listed_exchange: symbol,
+      timezone: 'Asia/Shanghai',
+      format: 'price',
+      pricescale: this.pricescale,
+      minmov: 1,
+      has_intraday: true,
+      supported_resolutions: ['1', '5', '15', '30', '60', 'D', 'W', 'M']
+    }
+    this.datafeed = new Datafeed({
+      history: params => {
+        return this.fetchHistoryData(params)
+      },
+      config: () => {
+        const _c = this.datafeedConfiguration
+        return new Promise(resolve => resolve(Object.assign(_config, _c)))
+      },
+      symbols: () => {
+        const _c = this.librarySymbolInfo
+        return new Promise(resolve => resolve(Object.assign(_symbols, _c)))
+      }
+    })
+  }
+
+  /**
+   * 初始化图表
+   */
+  public initTradingView() {
+    if (!this.datafeed) {
+      return
+    }
+    const _data: ChartingLibraryWidgetOptions = {
+      autosize: true,
+      preset: 'mobile',
+      debug: this.debug, // uncomment this line to see Library errors and warnings in the console
+      fullscreen: true,
+      symbol: this.symbol,
+      interval: this.interval,
+      container_id: 'tv_chart_container',
+      datafeed: this.datafeed,
+      library_path: '/charting_library/',
+      locale: this.locale,
+      disabled_features: CONFIG.disabled,
+      enabled_features: CONFIG.enabled,
+      charts_storage_url: 'http://saveload.tradingview.com',
+      charts_storage_api_version: '1.1',
+      client_id: 'tradingview.com',
+      user_id: 'public_user_id',
+      theme: 'Dark',
+      timezone: 'Asia/Shanghai',
+      studies_overrides: CONFIG.studies
+    }
+    const _c = this.chartingLibraryWidgetOptions
+    if (_c && _c.disabled_features && _data.disabled_features) {
+      _c.disabled_features = _c.disabled_features.concat(_data.disabled_features)
+    }
+    if (_c && _c.enabled_features && _data.enabled_features) {
+      _c.enabled_features = _c.enabled_features.concat(_data.enabled_features)
+    }
+    this.widget = new TradingView(Object.assign(_data, _c))
+  }
+
+  /**
+   * 获取历史数据
+   */
+  public async fetchHistoryData(params: IParams) {
+    if (this.interval !== params.resolution) {
+      const _msg = JSON.stringify({
+        event: IEvents.INTERVAL,
+        data: params
+      })
+      this.sendMessageToNative(JSON.stringify(_msg))
+      this.interval = params.resolution
+    }
+    const _msg = JSON.stringify({
+      event: IEvents.HISTORY,
+      data: params
+    })
+    this.isAwait = true
+    this.sendMessageToNative(_msg)
+    const data = await this.delayAwait()
+    this.klineData = []
+    this.awaitCount = 0
+    return {
+      bars: data,
+      meta: { noData: !data.length }
+    }
+  }
+
+  public created() {
+    window.sendMessageToHtml = this.receiveNativeNotification.bind(this)
+  }
+
+  public mounted() { }
+}
+
+export default KlineChart
+
+type IStudy = any
+type IWidget = any
+type IDelayAwait = any
+type IDevice = 'rn' | 'ios' | 'android'
+type IReactNativeWebView = {
+  postMessage(msg: string): void
+}
+declare global {
+  interface Window {
+    ReactNativeWebView: IReactNativeWebView
+    sendMessageToHtml: (msg: IMsg) => void
+  }
+}
+
+type IMsg = {
+  event: IEvents
+  data: any
+}
+
+type IParams = {
+  symbol: string
+  resolution: string
+  from: number
+  to: number
+}
+
+enum IEvents {
+  /**
+   * 初始化
+   */
+  INIT,
+  /**
+   * 历史数据处理
+   */
+  HISTORY,
+  /**
+   * 订阅处理
+   */
+  SUBSCRIBE,
+  /**
+   * 类型处理
+   */
+  TYPE,
+  /**
+   * 指标处理
+   */
+  STUDY,
+  /**
+   * 周期处理
+   */
+  INTERVAL,
+  /**
+   * 创建截图
+   */
+  CREATE_SHOT,
+  /**
+   * 移除截图
+   */
+  REMOVE_SHOT
+}

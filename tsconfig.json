@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    "target": "es5",
     "module": "esnext",
     "strict": true,
     "jsx": "preserve",
@@ -17,7 +17,6 @@
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
-  "http.proxyStrictSSL": false,
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
