@@ -7,8 +7,9 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "byron-kline-chart": "^1.0.0",
+    "byron-kline-datafeed": "^1.0.0",
     "html2canvas": "^1.0.0-rc.5",
-    "trader-view": "^1.1.3",
     "vconsole": "^3.3.4",
     "vue": "^2.6.10",
     "vue-class-component": "^7.1.0"

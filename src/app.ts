@@ -1,17 +1,17 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import { TradingView, Datafeed } from 'trader-view'
-import { IChartingLibraryWidget, IDatafeed } from 'trader-view'
-import { DatafeedConfiguration, LibrarySymbolInfo } from 'trader-view'
-import { ChartingLibraryWidgetOptions } from 'trader-view'
-import { Bar, LanguageCode } from 'trader-view'
+import * as TradingView from 'byron-kline-chart'
+import { Datafeed, IDatafeed } from 'byron-kline-datafeed'
+import { DatafeedConfiguration, LibrarySymbolInfo } from 'byron-kline-datafeed'
+import { ChartingLibraryWidgetOptions } from 'byron-kline-datafeed'
+import { Bar, LanguageCode } from 'byron-kline-datafeed'
 import html2canvas from 'html2canvas'
 import * as CONFIG from './config'
 import vconsole from 'vconsole'
 
 @Component
 class KlineChart extends Vue {
-  public widget?: IChartingLibraryWidget
+  public widget?: TradingView.IChartingLibraryWidget
   public datafeed?: IDatafeed
   public klineData: Bar[] = []
   public symbol = 'BTC/USDT'
@@ -283,11 +283,11 @@ class KlineChart extends Vue {
   /**
    * 初始化图表
    */
-  public initTradingView() {
+  public async initTradingView() {
     if (!this.datafeed) {
       return
     }
-    const _data: ChartingLibraryWidgetOptions = {
+    const _data: any = {
       autosize: true,
       preset: 'mobile',
       debug: this.debug, // uncomment this line to see Library errors and warnings in the console
@@ -296,7 +296,7 @@ class KlineChart extends Vue {
       interval: this.interval,
       container_id: 'tv_chart_container',
       datafeed: this.datafeed,
-      library_path: '/charting_library/',
+      library_path: './charting_library/',
       locale: this.locale,
       disabled_features: CONFIG.disabled,
       enabled_features: CONFIG.enabled,
@@ -315,7 +315,11 @@ class KlineChart extends Vue {
     if (_c && _c.enabled_features && _data.enabled_features) {
       _c.enabled_features = _c.enabled_features.concat(_data.enabled_features)
     }
-    this.widget = new TradingView(Object.assign(_data, _c))
+    this.widget = new TradingView.widget(Object.assign(_data, _c))
+    await this.appendScript('bundles/byron-kline-chart-init.js')
+    this.appendScript('bundles/runtime.d2ecd186b98a62a23c4b.js')
+    this.appendScript('bundles/vendors.f7dbb6a11b34b2534314.js')
+    this.appendScript('bundles/library.ac4616c46f24eefd2d78.js')
   }
 
   /**
@@ -343,6 +347,19 @@ class KlineChart extends Vue {
       bars: data,
       meta: { noData: !data.length }
     }
+  }
+
+  // 加载脚本
+  public appendScript(src: string) {
+    return new Promise(resolve => {
+      const script = document.createElement('script')
+      script.src = src
+      document.head.appendChild(script)
+      script.onload = function () {
+        resolve()
+        console.info(` >> ${src} 初始化成功`)
+      }
+    })
   }
 
   public created() {

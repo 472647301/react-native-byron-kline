@@ -1,0 +1,11 @@
+{
+  "name": "byron-kline",
+  "version": "2.0.1",
+  "description": "",
+  "main": "index.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
