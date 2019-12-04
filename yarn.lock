@@ -957,15 +957,15 @@ builtin-status-codes@^3.0.0:
   resolved "https://registry.npm.taobao.org/builtin-status-codes/download/builtin-status-codes-3.0.0.tgz#85982878e21b98e1c66425e03d0174788f569ee8"
   integrity sha1-hZgoeOIbmOHGZCXgPQF0eI9Wnug=
 
-byron-kline-chart@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/byron-kline-chart/-/byron-kline-chart-1.0.0.tgz#1cd61d8535e70377c86dd28761c82226b97163d3"
-  integrity sha512-3PcIr0KZOHOSDSLWTd+zSvFpr+O1GCPFjKskR3tPaDD48ds4txXDAothoiDdELhANh7ZWQPR3eLVd5rbvO5/7A==
+byron-kline-chart@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/byron-kline-chart/-/byron-kline-chart-1.0.1.tgz#0e08eaa273ce99ee7532e17e7edfcb7670f05e2a"
+  integrity sha512-Hb3EktU/XK+DRZON1RUp2CMFKwNKf0MVErBQjWU76qEho0sWU3uwf5iJvmCsA1i4SFC2kHka2AA4oOcCjsZtpg==
 
-byron-kline-datafeed@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/byron-kline-datafeed/-/byron-kline-datafeed-1.0.0.tgz#7932c18898660e4c31279fb4dd67dfef8476900e"
-  integrity sha512-TvXi2If2sRLBYm9b7b6g6c1zwGnc54IN/LNr4GTeLry8fqAh97/i4buBVez03e/1kRyn2lfpy710j4hsgusJZw==
+byron-kline-datafeed@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/byron-kline-datafeed/-/byron-kline-datafeed-1.0.1.tgz#d52749150ec98d6255c35b9f314e56721ff6e3a6"
+  integrity sha512-dEKVKW1d2oNlGAQ1WvGPApyfnrCZmpsid92I3VoeYlhPkgw6aS6VdYy2qTCldXTKrUCBgrwj5x72WjZuRJsgQA==
 
 bytes@3.0.0:
   version "3.0.0"

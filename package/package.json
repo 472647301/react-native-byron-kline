@@ -1,11 +1,14 @@
 {
   "name": "byron-kline",
-  "version": "2.0.2",
+  "version": "3.0.2",
   "description": "",
   "main": "index.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "byron-kline-chart": "^1.0.1"
+  }
 }

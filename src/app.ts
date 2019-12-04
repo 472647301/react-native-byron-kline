@@ -2,9 +2,9 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import * as TradingView from 'byron-kline-chart'
 import { Datafeed, IDatafeed } from 'byron-kline-datafeed'
-import { DatafeedConfiguration, LibrarySymbolInfo } from 'byron-kline-datafeed'
-import { ChartingLibraryWidgetOptions } from 'byron-kline-datafeed'
-import { Bar, LanguageCode } from 'byron-kline-datafeed'
+import { DatafeedConfiguration } from 'byron-kline-datafeed'
+import { LibrarySymbolInfo } from 'byron-kline-datafeed'
+import { Bar } from 'byron-kline-datafeed'
 import html2canvas from 'html2canvas'
 import * as CONFIG from './config'
 import vconsole from 'vconsole'
@@ -18,15 +18,16 @@ class KlineChart extends Vue {
   public interval = '15'
   public awaitCount = 0
   public isAwait = true
-  public locale: LanguageCode = 'zh'
+  public locale: TradingView.LanguageCode = 'zh'
   public debug = false
   public device: IDevice = 'rn'
   public pricescale = 100
   public studyList: IStudy = {}
   public datafeedConfiguration?: DatafeedConfiguration
   public librarySymbolInfo?: LibrarySymbolInfo
-  public chartingLibraryWidgetOptions?: ChartingLibraryWidgetOptions
+  public chartingLibraryWidgetOptions?: TradingView.ChartingLibraryWidgetOptions
   public imageUrl = ''
+  public isFirst = true
 
   /**
    * 发送消息给原生
@@ -61,6 +62,7 @@ class KlineChart extends Vue {
         if (data.debug) {
           this.debug = data.debug
           const v = new vconsole()
+          console.info(v.version)
         }
         if (data.locale) {
           this.locale = data.locale
@@ -80,18 +82,16 @@ class KlineChart extends Vue {
         this.initDatafeed()
         this.initTradingView()
         const _info = JSON.stringify({
-          status: true,
-          event: IEvents.INIT
+          event: IEvents.INIT_DONE
         })
         this.sendMessageToNative(_info)
         break
       case IEvents.HISTORY: // 图表历史
-        if (data.kline) {
+        if (data.kline && this.isAwait) {
           this.klineData = data.kline
           this.isAwait = false
           const _msg = JSON.stringify({
-            status: true,
-            event: IEvents.HISTORY
+            event: IEvents.HISTORY_DONE
           })
           this.sendMessageToNative(_msg)
         }
@@ -103,8 +103,7 @@ class KlineChart extends Vue {
             meta: { noData: !data.kline.length }
           })
           const _msg = JSON.stringify({
-            status: true,
-            event: IEvents.SUBSCRIBE
+            event: IEvents.SUBSCRIBE_DONE
           })
           this.sendMessageToNative(_msg)
         }
@@ -113,8 +112,7 @@ class KlineChart extends Vue {
         if (data.type && this.widget) {
           this.widget.chart().setChartType(data.type)
           const _msg = JSON.stringify({
-            status: true,
-            event: IEvents.TYPE
+            event: IEvents.TYPE_DONE
           })
           this.sendMessageToNative(_msg)
         }
@@ -133,9 +131,7 @@ class KlineChart extends Vue {
               study.setInputValues(oldValue)
               console.info(' >> Update study success:', oldValue)
               const _msg = JSON.stringify({
-                status: true,
-                event: IEvents.STUDY,
-                type: 'update'
+                event: IEvents.STUDY_DONE
               })
               this.sendMessageToNative(_msg)
             }
@@ -152,9 +148,7 @@ class KlineChart extends Vue {
                 this.studyList[data.studyId] = v
               }
               const _msg = JSON.stringify({
-                status: true,
-                event: IEvents.STUDY,
-                type: 'create'
+                event: IEvents.STUDY_DONE
               })
               this.sendMessageToNative(_msg)
             })
@@ -166,8 +160,7 @@ class KlineChart extends Vue {
           const chart = this.widget.chart()
           chart.setResolution(data.interval, () => {
             const _msg = JSON.stringify({
-              status: true,
-              event: IEvents.INTERVAL
+              event: IEvents.INTERVAL_DONE
             })
             this.sendMessageToNative(_msg)
           })
@@ -191,8 +184,7 @@ class KlineChart extends Vue {
         }).then(canvas => {
           this.imageUrl = canvas.toDataURL('image/png')
           const _msg = JSON.stringify({
-            status: true,
-            event: IEvents.CREATE_SHOT
+            event: IEvents.CREATE_SHOT_DONE
           })
           this.sendMessageToNative(_msg)
         })
@@ -200,18 +192,16 @@ class KlineChart extends Vue {
       case IEvents.REMOVE_SHOT:
         this.imageUrl = ''
         const _msg = JSON.stringify({
-          status: true,
-          event: IEvents.REMOVE_SHOT
+          event: IEvents.REMOVE_SHOT_DONE
         })
         this.sendMessageToNative(_msg)
         break
       default:
-        if (this.widget) {
-          const data = msg.data
+        if (this.widget && msg.data.event) {
           const widget = this.widget as IWidget
           const _widget = widget[msg.event] ? widget[msg.event]() : {}
-          if (_widget && _widget[data.event]) {
-            _widget[data.event](data.data)
+          if (_widget && _widget[msg.data.event]) {
+            _widget[msg.data.event](data.data)
           }
         }
         break
@@ -287,7 +277,7 @@ class KlineChart extends Vue {
     if (!this.datafeed) {
       return
     }
-    const _data: any = {
+    const _data = {
       autosize: true,
       preset: 'mobile',
       debug: this.debug, // uncomment this line to see Library errors and warnings in the console
@@ -328,17 +318,22 @@ class KlineChart extends Vue {
   public async fetchHistoryData(params: IParams) {
     if (this.interval !== params.resolution) {
       const _msg = JSON.stringify({
-        event: IEvents.INTERVAL,
-        data: params
+        event: IEvents.INTERVAL_SWITCH,
+        data: Object.assign(params, { oldResolution: this.interval })
       })
       this.sendMessageToNative(JSON.stringify(_msg))
       this.interval = params.resolution
     }
     const _msg = JSON.stringify({
       event: IEvents.HISTORY,
-      data: params
+      data: Object.assign(params, { isFirst: this.isFirst })
     })
-    this.isAwait = true
+    if (this.isFirst) {
+      this.isFirst = false
+    }
+    if (!this.isAwait) {
+      this.isAwait = true
+    }
     this.sendMessageToNative(_msg)
     const data = await this.delayAwait()
     this.klineData = []
@@ -387,7 +382,26 @@ declare global {
 
 type IMsg = {
   event: IEvents
-  data: any
+  data: IMsgData
+}
+
+type IMsgData = {
+  symbol?: string
+  interval?: string
+  debug?: boolean
+  locale?: TradingView.LanguageCode
+  pricescale?: number
+  librarySymbolInfo?: TradingView.LibrarySymbolInfo
+  datafeedConfiguration?: TradingView.DatafeedConfiguration
+  chartingLibraryWidgetOptions?: TradingView.ChartingLibraryWidgetOptions
+  kline?: Array<Bar>
+  type?: TradingView.SeriesStyle
+  studyName?: string
+  studyValue?: Array<number>
+  studyId?: string
+  studyPlot?: TradingView.CreateStudyOptions
+  event?: string
+  data?: any
 }
 
 type IParams = {
@@ -395,6 +409,8 @@ type IParams = {
   resolution: string
   from: number
   to: number
+  isFirst?: boolean
+  oldResolution?: string
 }
 
 enum IEvents {
@@ -429,5 +445,45 @@ enum IEvents {
   /**
    * 移除截图
    */
-  REMOVE_SHOT
+  REMOVE_SHOT,
+  /**
+   * 初始化完成
+   */
+  INIT_DONE,
+  /**
+   * 历史数据处理完成
+   */
+  HISTORY_DONE,
+  /**
+   * 订阅数据处理完成
+   */
+  SUBSCRIBE_DONE,
+  /**
+   * 类型处理完成
+   */
+  TYPE_DONE,
+  /**
+   * 指标处理完成
+   */
+  STUDY_DONE,
+  /**
+   * 周期处理完成
+   */
+  INTERVAL_DONE,
+  /**
+   * 周期切换
+   */
+  INTERVAL_SWITCH,
+  /**
+   * 创建截图完成
+   */
+  CREATE_SHOT_DONE,
+  /**
+   * 移除截图完成
+   */
+  REMOVE_SHOT_DONE,
+  /**
+   * DEFAULT
+   */
+  DEFAULT
 }
