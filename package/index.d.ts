@@ -39,79 +39,79 @@ export declare enum KLineNativeEvents {
     /**
      * 初始化
      */
-    INIT = 0,
+    INIT = "INIT",
     /**
      * 历史数据处理
      */
-    HISTORY = 1,
+    HISTORY = "HISTORY",
     /**
      * 订阅处理
      */
-    SUBSCRIBE = 2,
+    SUBSCRIBE = "SUBSCRIBE",
     /**
      * 类型处理
      */
-    TYPE = 3,
+    TYPE = "TYPE",
     /**
      * 指标处理
      */
-    STUDY = 4,
+    STUDY = "STUDY",
     /**
      * 周期处理
      */
-    INTERVAL = 5,
+    INTERVAL = "INTERVAL",
     /**
      * 创建截图
      */
-    CREATE_SHOT = 6,
+    CREATE_SHOT = "CREATE_SHOT",
     /**
      * 移除截图
      */
-    REMOVE_SHOT = 7,
+    REMOVE_SHOT = "REMOVE_SHOT",
     /**
      * DEFAULT
      */
-    DEFAULT = 8
+    DEFAULT = "DEFAULT"
 }
 export declare enum KLineHtmlEvents {
     /**
-     * 初始化完成
-     */
-    INIT_DONE = 0,
+      * 初始化完成
+      */
+    INIT_DONE = "INIT_DONE",
     /**
      * 获取历史数据
      */
-    FETCH_HISTORY = 1,
+    FETCH_HISTORY = "FETCH_HISTORY",
     /**
      * 历史数据处理完成
      */
-    HISTORY_DONE = 2,
+    HISTORY_DONE = "HISTORY_DONE",
     /**
      * 订阅数据处理完成
      */
-    SUBSCRIBE_DONE = 3,
+    SUBSCRIBE_DONE = "SUBSCRIBE_DONE",
     /**
      * 类型处理完成
      */
-    TYPE_DONE = 4,
+    TYPE_DONE = "TYPE_DONE",
     /**
      * 指标处理完成
      */
-    STUDY_DONE = 5,
+    STUDY_DONE = "STUDY_DONE",
     /**
      * 周期处理完成
      */
-    INTERVAL_DONE = 6,
+    INTERVAL_DONE = "INTERVAL_DONE",
     /**
      * 周期切换
      */
-    INTERVAL_SWITCH = 7,
+    INTERVAL_SWITCH = "INTERVAL_SWITCH",
     /**
      * 创建截图完成
      */
-    CREATE_SHOT_DONE = 8,
+    CREATE_SHOT_DONE = "CREATE_SHOT_DONE",
     /**
      * 移除截图完成
      */
-    REMOVE_SHOT_DONE = 9
+    REMOVE_SHOT_DONE = "REMOVE_SHOT_DONE"
 }
