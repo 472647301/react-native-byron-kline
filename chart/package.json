@@ -1,6 +1,6 @@
 {
   "name": "byron-kline-chart",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "index.min.js",
   "scripts": {

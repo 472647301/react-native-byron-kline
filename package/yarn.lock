@@ -2,7 +2,12 @@
 # yarn lockfile v1
 
 
-byron-kline-chart@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/byron-kline-chart/-/byron-kline-chart-1.0.1.tgz#0e08eaa273ce99ee7532e17e7edfcb7670f05e2a"
-  integrity sha512-Hb3EktU/XK+DRZON1RUp2CMFKwNKf0MVErBQjWU76qEho0sWU3uwf5iJvmCsA1i4SFC2kHka2AA4oOcCjsZtpg==
+byron-kline-chart@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/byron-kline-chart/-/byron-kline-chart-1.0.2.tgz#af78b2efb7c69081c6e3c1b7ab3c7f39c38999c5"
+  integrity sha512-oiDVARLVN2XI4VBrxCGLg08g5/pEkDEDA/hscwLh0s1QEOGnQlbfRZZ/mZfCNFwpLvkwu6qV8CZIhWyEL89QLg==
+
+typescript@^3.7.3:
+  version "3.7.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.7.3.tgz#b36840668a16458a7025b9eabfad11b66ab85c69"
+  integrity sha512-Mcr/Qk7hXqFBXMN7p7Lusj1ktCBydylfQM/FZCk5glCNQJrCUKPkMHdo9R0MTFWsC/4kPFvDS0fDPvukfCkFsw==

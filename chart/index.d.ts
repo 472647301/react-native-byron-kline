@@ -287,10 +287,10 @@ export interface ChartingLibraryWidgetConstructor {
 	new (options: ChartingLibraryWidgetOptions | TradingTerminalWidgetOptions): IChartingLibraryWidget;
 }
 export interface ChartingLibraryWidgetOptions {
-	container_id: string;
-	datafeed: IBasicDataFeed | (IBasicDataFeed & IDatafeedQuotesApi);
-	interval: ResolutionString;
-	symbol: string;
+	container_id?: string;
+	datafeed?: IBasicDataFeed | (IBasicDataFeed & IDatafeedQuotesApi);
+	interval?: ResolutionString;
+	symbol?: string;
 	auto_save_delay?: number;
 	autosize?: boolean;
 	debug?: boolean;
@@ -300,7 +300,7 @@ export interface ChartingLibraryWidgetOptions {
 	fullscreen?: boolean;
 	height?: number;
 	library_path?: string;
-	locale: LanguageCode;
+	locale?: LanguageCode;
 	numeric_formatting?: NumericFormattingParams;
 	saved_data?: object;
 	studies_access?: AccessList;
@@ -1025,40 +1025,40 @@ export interface LibrarySymbolInfo {
 	/**
 	 * Symbol Name
 	 */
-	name: string;
-	full_name: string;
+	name?: string;
+	full_name?: string;
 	base_name?: [string];
 	/**
 	 * Unique symbol id
 	 */
 	ticker?: string;
-	description: string;
-	type: string;
+	description?: string;
+	type?: string;
 	/**
 	 * @example "1700-0200"
 	 */
-	session: string;
+	session?: string;
 	/**
 	 * Traded exchange
 	 * @example "NYSE"
 	 */
-	exchange: string;
-	listed_exchange: string;
-	timezone: Timezone;
+	exchange?: string;
+	listed_exchange?: string;
+	timezone?: Timezone;
 	/**
 	 * Prices format: "price" or "volume"
 	 */
-	format: SeriesFormat;
+	format?: SeriesFormat;
 	/**
 	 * Code (Tick)
 	 * @example 8/16/.../256 (1/8/100 1/16/100 ... 1/256/100) or 1/10/.../10000000 (1 0.1 ... 0.0000001)
 	 */
-	pricescale: number;
+	pricescale?: number;
 	/**
 	 * The number of units that make up one tick.
 	 * @example For example, U.S. equities are quotes in decimals, and tick in decimals, and can go up +/- .01. So the tick increment is 1. But the e-mini S&P futures contract, though quoted in decimals, goes up in .25 increments, so the tick increment is 25. (see also Tick Size)
 	 */
-	minmov: number;
+	minmov?: number;
 	fractional?: boolean;
 	/**
 	 * @example Quarters of 1/32: pricescale=128, minmovement=1, minmovement2=4
@@ -1071,7 +1071,7 @@ export interface LibrarySymbolInfo {
 	/**
 	 * An array of resolutions which should be enabled in resolutions picker for this symbol.
 	 */
-	supported_resolutions: ResolutionString[];
+	supported_resolutions?: ResolutionString[];
 	/**
 	 * @example (for ex.: "1,5,60") - only these resolutions will be requested, all others will be built using them if possible
 	 */

@@ -2,8 +2,6 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import * as TradingView from 'byron-kline-chart'
 import { Datafeed, IDatafeed } from 'byron-kline-datafeed'
-import { DatafeedConfiguration } from 'byron-kline-datafeed'
-import { LibrarySymbolInfo } from 'byron-kline-datafeed'
 import { Bar } from 'byron-kline-datafeed'
 import html2canvas from 'html2canvas'
 import * as CONFIG from './config'
@@ -23,8 +21,8 @@ class KlineChart extends Vue {
   public device: IDevice = 'rn'
   public pricescale = 100
   public studyList: IStudy = {}
-  public datafeedConfiguration?: DatafeedConfiguration
-  public librarySymbolInfo?: LibrarySymbolInfo
+  public datafeedConfiguration?: TradingView.DatafeedConfiguration
+  public librarySymbolInfo?: TradingView.LibrarySymbolInfo
   public chartingLibraryWidgetOptions?: TradingView.ChartingLibraryWidgetOptions
   public imageUrl = ''
   public isFirst = true
@@ -49,10 +47,10 @@ class KlineChart extends Vue {
   /**
    * 接收原生通知
    */
-  public receiveNativeNotification(msg: IMsg) {
+  public receiveNativeNotification(msg: INativeNotice) {
     const data = msg.data || {}
     switch (msg.event) {
-      case IEvents.INIT: // 图表初始化
+      case INativeEvents.INIT: // 图表初始化
         if (data.symbol) {
           this.symbol = data.symbol
         }
@@ -82,42 +80,42 @@ class KlineChart extends Vue {
         this.initDatafeed()
         this.initTradingView()
         const _info = JSON.stringify({
-          event: IEvents.INIT_DONE
+          event: IHtmlEvents.INIT_DONE
         })
         this.sendMessageToNative(_info)
         break
-      case IEvents.HISTORY: // 图表历史
+      case INativeEvents.HISTORY: // 图表历史
         if (data.kline && this.isAwait) {
           this.klineData = data.kline
           this.isAwait = false
           const _msg = JSON.stringify({
-            event: IEvents.HISTORY_DONE
+            event: IHtmlEvents.HISTORY_DONE
           })
           this.sendMessageToNative(_msg)
         }
         break
-      case IEvents.SUBSCRIBE: // 图表订阅
+      case INativeEvents.SUBSCRIBE: // 图表订阅
         if (data.kline && !this.isAwait && this.datafeed) {
           this.datafeed.updateData({
             bars: data.kline,
             meta: { noData: !data.kline.length }
           })
           const _msg = JSON.stringify({
-            event: IEvents.SUBSCRIBE_DONE
+            event: IHtmlEvents.SUBSCRIBE_DONE
           })
           this.sendMessageToNative(_msg)
         }
         break
-      case IEvents.TYPE: // 图表类型
+      case INativeEvents.TYPE: // 图表类型
         if (data.type && this.widget) {
           this.widget.chart().setChartType(data.type)
           const _msg = JSON.stringify({
-            event: IEvents.TYPE_DONE
+            event: IHtmlEvents.TYPE_DONE
           })
           this.sendMessageToNative(_msg)
         }
         break
-      case IEvents.STUDY: // 图表指标
+      case INativeEvents.STUDY: // 图表指标
         if (data.studyName && this.widget) {
           const name = data.studyName
           const value = data.studyValue || []
@@ -131,7 +129,7 @@ class KlineChart extends Vue {
               study.setInputValues(oldValue)
               console.info(' >> Update study success:', oldValue)
               const _msg = JSON.stringify({
-                event: IEvents.STUDY_DONE
+                event: IHtmlEvents.STUDY_DONE
               })
               this.sendMessageToNative(_msg)
             }
@@ -148,25 +146,25 @@ class KlineChart extends Vue {
                 this.studyList[data.studyId] = v
               }
               const _msg = JSON.stringify({
-                event: IEvents.STUDY_DONE
+                event: IHtmlEvents.STUDY_DONE
               })
               this.sendMessageToNative(_msg)
             })
           }
         }
         break
-      case IEvents.INTERVAL: // 图表周期
+      case INativeEvents.INTERVAL: // 图表周期
         if (data.interval && this.widget) {
           const chart = this.widget.chart()
           chart.setResolution(data.interval, () => {
             const _msg = JSON.stringify({
-              event: IEvents.INTERVAL_DONE
+              event: IHtmlEvents.INTERVAL_DONE
             })
             this.sendMessageToNative(_msg)
           })
         }
         break
-      case IEvents.CREATE_SHOT:
+      case INativeEvents.CREATE_SHOT:
         const width = window.innerWidth // 获取dom 宽度
         const height = window.innerHeight // 获取dom 高度
         const canvas = document.createElement('canvas') // 创建一个canvas节点
@@ -184,25 +182,29 @@ class KlineChart extends Vue {
         }).then(canvas => {
           this.imageUrl = canvas.toDataURL('image/png')
           const _msg = JSON.stringify({
-            event: IEvents.CREATE_SHOT_DONE
+            event: IHtmlEvents.CREATE_SHOT_DONE
           })
           this.sendMessageToNative(_msg)
         })
         break
-      case IEvents.REMOVE_SHOT:
+      case INativeEvents.REMOVE_SHOT:
         this.imageUrl = ''
         const _msg = JSON.stringify({
-          event: IEvents.REMOVE_SHOT_DONE
+          event: IHtmlEvents.REMOVE_SHOT_DONE
         })
         this.sendMessageToNative(_msg)
         break
       default:
         if (this.widget && msg.data.event) {
           const widget = this.widget as IWidget
-          const _widget = widget[msg.event] ? widget[msg.event]() : {}
-          if (_widget && _widget[msg.data.event]) {
-            _widget[msg.data.event](data.data)
+          const _widget = widget[msg.data.event] ? widget[msg.data.event]() : {}
+          if (_widget && _widget[msg.data.data.event]) {
+            _widget[msg.data.data.event](data.data.data)
           }
+          const _msg = JSON.stringify({
+            event: msg.event
+          })
+          this.sendMessageToNative(_msg)
         }
         break
     }
@@ -318,14 +320,14 @@ class KlineChart extends Vue {
   public async fetchHistoryData(params: IParams) {
     if (this.interval !== params.resolution) {
       const _msg = JSON.stringify({
-        event: IEvents.INTERVAL_SWITCH,
+        event: IHtmlEvents.INTERVAL_SWITCH,
         data: Object.assign(params, { oldResolution: this.interval })
       })
       this.sendMessageToNative(JSON.stringify(_msg))
       this.interval = params.resolution
     }
     const _msg = JSON.stringify({
-      event: IEvents.HISTORY,
+      event: IHtmlEvents.FETCH_HISTORY,
       data: Object.assign(params, { isFirst: this.isFirst })
     })
     if (this.isFirst) {
@@ -376,16 +378,58 @@ type IReactNativeWebView = {
 declare global {
   interface Window {
     ReactNativeWebView: IReactNativeWebView
-    sendMessageToHtml: (msg: IMsg) => void
+    sendMessageToHtml: (msg: INativeNotice) => void
   }
 }
-
-type IMsg = {
-  event: IEvents
-  data: IMsgData
+enum IHtmlEvents {
+  /**
+   * 初始化完成
+   */
+  INIT_DONE,
+  /**
+   * 获取历史数据
+   */
+  FETCH_HISTORY,
+  /**
+   * 历史数据处理完成
+   */
+  HISTORY_DONE,
+  /**
+   * 订阅数据处理完成
+   */
+  SUBSCRIBE_DONE,
+  /**
+   * 类型处理完成
+   */
+  TYPE_DONE,
+  /**
+   * 指标处理完成
+   */
+  STUDY_DONE,
+  /**
+   * 周期处理完成
+   */
+  INTERVAL_DONE,
+  /**
+   * 周期切换
+   */
+  INTERVAL_SWITCH,
+  /**
+   * 创建截图完成
+   */
+  CREATE_SHOT_DONE,
+  /**
+   * 移除截图完成
+   */
+  REMOVE_SHOT_DONE
 }
 
-type IMsgData = {
+type INativeNotice = {
+  event: INativeEvents
+  data: INativeData
+}
+
+type INativeData = {
   symbol?: string
   interval?: string
   debug?: boolean
@@ -413,7 +457,7 @@ type IParams = {
   oldResolution?: string
 }
 
-enum IEvents {
+enum INativeEvents {
   /**
    * 初始化
    */
@@ -446,42 +490,6 @@ enum IEvents {
    * 移除截图
    */
   REMOVE_SHOT,
-  /**
-   * 初始化完成
-   */
-  INIT_DONE,
-  /**
-   * 历史数据处理完成
-   */
-  HISTORY_DONE,
-  /**
-   * 订阅数据处理完成
-   */
-  SUBSCRIBE_DONE,
-  /**
-   * 类型处理完成
-   */
-  TYPE_DONE,
-  /**
-   * 指标处理完成
-   */
-  STUDY_DONE,
-  /**
-   * 周期处理完成
-   */
-  INTERVAL_DONE,
-  /**
-   * 周期切换
-   */
-  INTERVAL_SWITCH,
-  /**
-   * 创建截图完成
-   */
-  CREATE_SHOT_DONE,
-  /**
-   * 移除截图完成
-   */
-  REMOVE_SHOT_DONE,
   /**
    * DEFAULT
    */
