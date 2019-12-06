@@ -128,7 +128,7 @@ class KlineChart extends Vue {
               oldValue[0].value = Number(value[0] || 0)
               oldValue[1].value = Number(value[1] || 0)
               study.setInputValues(oldValue)
-              console.info(' >> Update study success:', oldValue)
+              console.info(' >> Update study success:', data.studyId, study, oldValue)
               const _msg = JSON.stringify({
                 event: IHtmlEvents.STUDY_DONE
               })
@@ -143,6 +143,7 @@ class KlineChart extends Vue {
               undefined,
               data.studyPlot
             ).then(v => {
+              console.info(' >> Created study success:', data.studyId, v, value)
               if (data.studyId && v) {
                 this.studyList[data.studyId] = v
               }
@@ -261,7 +262,7 @@ class KlineChart extends Vue {
     }
     this.datafeed = new Datafeed({
       history: params => {
-        return this.fetchHistoryData(params).then(d => d)
+        return this.fetchHistoryData(params)
       },
       config: () => {
         const _c = this.datafeedConfiguration
@@ -327,6 +328,9 @@ class KlineChart extends Vue {
       })
       this.sendMessageToNative(JSON.stringify(_msg))
       this.interval = params.resolution
+      if (!this.isFirst) {
+        this.isFirst = true
+      }
     }
     const _msg = JSON.stringify({
       event: IHtmlEvents.FETCH_HISTORY,

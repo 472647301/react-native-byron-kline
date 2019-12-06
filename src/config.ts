@@ -1,23 +1,33 @@
 export const disabled = [
-  'border_around_the_chart',
-  'use_localstorage_for_settings',
   'header_symbol_search',
+  'symbol_info',
+  'link_to_tradingview',
+  'header_compare',
+  'header_screenshot',
+  'use_localstorage_for_settings',
+  'save_chart_properties_to_local_storage',
+  'header_chart_type',
+  'display_market_status',
+  'symbol_search_hot_key',
+  'compare_symbol',
+  'border_around_the_chart',
+  'remove_library_container_border',
+  'symbol_info',
+  'header_interval_dialog_button',
+  'show_interval_dialog_on_key_press',
   'timeframes_toolbar',
-  'header_chart_type', // 隐藏k线样式选择
+  'header_fullscreen_button',
+  'legend_context_menu',
   'volume_force_overlay',
+  'context_menus',
+  'source_selection_markers',
   'header_saveload',
   'header_resolutions',
-  'header_compare',
   'header_undo_redo',
-  'header_screenshot',
-  'display_market_status',
   'show_chart_property_page',
   'show_logo_on_all_charts',
   'control_bar',
-  'hide_last_na_study_output',
-  'header_widget',
-  'context_menus',// 隐藏右键上下文'
-  'source_selection_markers'// 禁用k线选择后小标记
+  'header_widget'
 ]
 
 export const enabled = [
