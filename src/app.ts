@@ -25,7 +25,6 @@ class KlineChart extends Vue {
   public librarySymbolInfo?: TradingView.LibrarySymbolInfo
   public chartingLibraryWidgetOptions?: TradingView.ChartingLibraryWidgetOptions
   public imageUrl = ''
-  public isFirst = true
 
   /**
    * 发送消息给原生
@@ -328,17 +327,11 @@ class KlineChart extends Vue {
       })
       this.sendMessageToNative(JSON.stringify(_msg))
       this.interval = params.resolution
-      if (!this.isFirst) {
-        this.isFirst = true
-      }
     }
     const _msg = JSON.stringify({
       event: IHtmlEvents.FETCH_HISTORY,
-      data: Object.assign(params, { isFirst: this.isFirst })
+      data: params
     })
-    if (this.isFirst) {
-      this.isFirst = false
-    }
     if (!this.isAwait) {
       this.isAwait = true
     }

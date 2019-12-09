@@ -316,6 +316,7 @@ export interface OptionHistory {
   resolution: string;
   from: number;
   to: number;
+  isFirst: boolean;
 }
 export interface UdfCompatibleConfiguration extends DatafeedConfiguration {
   // tslint:disable:tv-variable-name

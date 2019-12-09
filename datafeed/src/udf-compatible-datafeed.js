@@ -231,18 +231,11 @@ var UDFCompatibleDatafeed = /** @class */ (function () {
                 .catch(onError);
         }
     };
-    UDFCompatibleDatafeed.prototype.getBars = function (symbolInfo, resolution, rangeStartDate, rangeEndDate, onResult, onError) {
+    UDFCompatibleDatafeed.prototype.getBars = function (symbolInfo, resolution, rangeStartDate, rangeEndDate, onResult, onError, isFirst) {
         this._historyProvider
-            .getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate)
+            .getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate, isFirst)
             .then(function (result) {
             onResult(result.bars, result.meta);
-            // if (this.status === Status.COMPLETE) {
-            //   this.status = Status.LOADING;
-            // }
-            // this.delayAwait().then((result: Bar[]) => {
-            //   onResult(result, { noData: !result.length });
-            //   this.awaitCount = 0;
-            // });
         })
             .catch(onError);
     };
