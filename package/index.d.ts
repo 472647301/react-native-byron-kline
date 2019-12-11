@@ -32,7 +32,7 @@ export interface KLineParams {
     resolution: string;
     from: number;
     to: number;
-    isFirst?: boolean;
+    isFirst: boolean;
     oldResolution?: string;
 }
 export declare enum KLineNativeEvents {

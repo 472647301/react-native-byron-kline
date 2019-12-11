@@ -7,9 +7,10 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-    "byron-kline-chart": "^1.0.3",
-    "byron-kline-datafeed": "^1.0.3",
+    "byron-kline-chart": "^1.0.5",
+    "byron-kline-datafeed": "^1.0.5",
     "html2canvas": "^1.0.0-rc.5",
+    "jstz": "^2.1.1",
     "vconsole": "^3.3.4",
     "vue": "^2.6.10",
     "vue-class-component": "^7.1.0"

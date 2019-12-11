@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import jstz from 'jstz'
 import Component from 'vue-class-component'
 import * as TradingView from 'byron-kline-chart'
 import { Datafeed, IDatafeed } from 'byron-kline-datafeed'
@@ -15,7 +16,7 @@ class KlineChart extends Vue {
   public symbol = 'BTC/USDT'
   public interval = '15'
   public awaitCount = 0
-  public isAwait = true
+  public awaitRequest = false
   public locale: TradingView.LanguageCode = 'zh'
   public debug = false
   public device: IDevice = 'rn'
@@ -85,9 +86,9 @@ class KlineChart extends Vue {
         this.sendMessageToNative(_info)
         break
       case INativeEvents.HISTORY: // 图表历史
-        if (data.kline && this.isAwait) {
+        if (data.kline && this.awaitRequest) {
           this.klineData = data.kline
-          this.isAwait = false
+          this.awaitRequest = false
           const _msg = JSON.stringify({
             event: IHtmlEvents.HISTORY_DONE
           })
@@ -95,7 +96,7 @@ class KlineChart extends Vue {
         }
         break
       case INativeEvents.SUBSCRIBE: // 图表订阅
-        if (data.kline && !this.isAwait && this.datafeed) {
+        if (data.kline && !this.awaitRequest && this.datafeed) {
           this.datafeed.updateData({
             bars: data.kline,
             meta: { noData: !data.kline.length }
@@ -120,38 +121,23 @@ class KlineChart extends Vue {
           const name = data.studyName
           const value = data.studyValue || []
           const chart = this.widget.chart()
-          if (data.studyId && this.studyList[data.studyId]) {
-            const study = chart.getStudyById(this.studyList[data.studyId])
-            const oldValue = study.getInputValues()
-            if (study.isUserEditEnabled()) {
-              oldValue[0].value = Number(value[0] || 0)
-              oldValue[1].value = Number(value[1] || 0)
-              study.setInputValues(oldValue)
-              console.info(' >> Update study success:', data.studyId, study, oldValue)
-              const _msg = JSON.stringify({
-                event: IHtmlEvents.STUDY_DONE
-              })
-              this.sendMessageToNative(_msg)
+          chart.createStudy(
+            name,
+            false,
+            false,
+            value,
+            undefined,
+            data.studyPlot
+          ).then(v => {
+            console.info(' >> Created study success:', data.studyId, v, value)
+            if (data.studyId && v) {
+              this.studyList[data.studyId] = v
             }
-          } else {
-            chart.createStudy(
-              name,
-              false,
-              false,
-              value,
-              undefined,
-              data.studyPlot
-            ).then(v => {
-              console.info(' >> Created study success:', data.studyId, v, value)
-              if (data.studyId && v) {
-                this.studyList[data.studyId] = v
-              }
-              const _msg = JSON.stringify({
-                event: IHtmlEvents.STUDY_DONE
-              })
-              this.sendMessageToNative(_msg)
+            const _msg = JSON.stringify({
+              event: IHtmlEvents.STUDY_DONE
             })
-          }
+            this.sendMessageToNative(_msg)
+          })
         }
         break
       case INativeEvents.INTERVAL: // 图表周期
@@ -219,8 +205,8 @@ class KlineChart extends Vue {
     return new Promise((resolve, reject) => {
       this.awaitCount++
       console.info(`>> Await count: ${this.awaitCount * 300}ms`)
-      if (!this.isAwait) {
-        return resolve(this.klineData)
+      if (!this.awaitRequest) {
+        return resolve(this.klineData || [])
       } else {
         return this.awaitCount < 100 ? reject() : resolve()
       }
@@ -252,10 +238,11 @@ class KlineChart extends Vue {
       session: '24x7',
       exchange: symbol,
       listed_exchange: symbol,
-      timezone: 'Asia/Shanghai',
-      format: 'price',
+      timezone: jstz.determine().name(),
+      format: '',
       pricescale: this.pricescale,
       minmov: 1,
+      has_empty_bars: true,
       has_intraday: true,
       supported_resolutions: ['1', '5', '15', '30', '60', 'D', 'W', 'M']
     }
@@ -299,7 +286,7 @@ class KlineChart extends Vue {
       client_id: 'tradingview.com',
       user_id: 'public_user_id',
       theme: 'Dark',
-      timezone: 'Asia/Shanghai',
+      timezone: jstz.determine().name(),
       studies_overrides: CONFIG.studies
     }
     const _c = this.chartingLibraryWidgetOptions
@@ -323,17 +310,17 @@ class KlineChart extends Vue {
     if (this.interval !== params.resolution) {
       const _msg = JSON.stringify({
         event: IHtmlEvents.INTERVAL_SWITCH,
-        data: Object.assign(params, { oldResolution: this.interval })
+        data: { ...params, oldResolution: this.interval }
       })
-      this.sendMessageToNative(JSON.stringify(_msg))
+      this.sendMessageToNative(_msg)
       this.interval = params.resolution
     }
     const _msg = JSON.stringify({
       event: IHtmlEvents.FETCH_HISTORY,
       data: params
     })
-    if (!this.isAwait) {
-      this.isAwait = true
+    if (!this.awaitRequest) {
+      this.awaitRequest = true
     }
     this.sendMessageToNative(_msg)
     const data = await this.delayAwait()

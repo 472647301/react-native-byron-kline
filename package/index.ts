@@ -9,8 +9,8 @@ export function sendMessageToHtml(event: KLineNativeEvents, options: KLineOption
 
 export function klineChartHtml() {
   return `
-  <!DOCTYPE html><html lang=en dir=ltr><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link type=text/css href=bundles/library.b9460c2b30f8433101d6.css rel=stylesheet><script src=bundles/byron_kline_tv_languages.js></script><title>byron-kline</title><link href=css/app.8096f973.css rel=preload as=style><link href=js/app.f3c2af5b.js rel=preload as=script><link href=js/chunk-vendors.d66d0e11.js rel=preload as=script><link href=css/app.8096f973.css rel=stylesheet></head><body class="chart-page unselectable on-widget"><noscript><strong>We're sorry but rn-tv doesn't work properly without JavaScript enabled. Please enable it to continue.</strong></noscript><div class=loading-indicator id=loading-indicator></div><script>var JSServer = {};
-      var __initialEnabledFeaturesets = ["charting_library"];</script><div id=app></div><script src=js/chunk-vendors.d66d0e11.js></script><script src=js/app.f3c2af5b.js></script></body></html>
+  <!DOCTYPE html><html lang=en dir=ltr><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link type=text/css href=bundles/library.b9460c2b30f8433101d6.css rel=stylesheet><script src=bundles/byron_kline_tv_languages.js></script><title>byron-kline</title><link href=css/app.8096f973.css rel=preload as=style><link href=js/app.323a05e8.js rel=preload as=script><link href=js/chunk-vendors.e924358e.js rel=preload as=script><link href=css/app.8096f973.css rel=stylesheet></head><body class="chart-page unselectable on-widget"><noscript><strong>We're sorry but rn-tv doesn't work properly without JavaScript enabled. Please enable it to continue.</strong></noscript><div class=loading-indicator id=loading-indicator></div><script>var JSServer = {};
+      var __initialEnabledFeaturesets = ["charting_library"];</script><div id=app></div><script src=js/chunk-vendors.e924358e.js></script><script src=js/app.323a05e8.js></script></body></html>
   `
 }
 
@@ -47,7 +47,7 @@ export interface KLineParams {
   resolution: string
   from: number
   to: number
-  isFirst?: boolean
+  isFirst: boolean
   oldResolution?: string
 }
 

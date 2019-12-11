@@ -957,15 +957,15 @@ builtin-status-codes@^3.0.0:
   resolved "https://registry.npm.taobao.org/builtin-status-codes/download/builtin-status-codes-3.0.0.tgz#85982878e21b98e1c66425e03d0174788f569ee8"
   integrity sha1-hZgoeOIbmOHGZCXgPQF0eI9Wnug=
 
-byron-kline-chart@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/byron-kline-chart/-/byron-kline-chart-1.0.3.tgz#94fec2a52993961ab7a190ee0acf84e58c2867f5"
-  integrity sha512-M9c5mxs3BvtyURaWsl52mU7MNYjiqbTcfpZUqD6P2WQckVwqtWGIRO4ge+vMgsmOgsxdUwnISP+eYwne/tURgw==
+byron-kline-chart@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/byron-kline-chart/-/byron-kline-chart-1.0.5.tgz#1c1f85d4f42b38962b1e9ccfabd0e326ec3f91d7"
+  integrity sha512-Qf2CDO/fm6+AQmWJ+GANf31LIkF1cvMEzqyco/oKQJyxlTBQe4E6TEvugPMHDJLnx4C7Pk13io3fp2PndaWjPA==
 
-byron-kline-datafeed@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/byron-kline-datafeed/-/byron-kline-datafeed-1.0.3.tgz#0dc12ceb540dc4e491acb7d67e5ccfdb82932e44"
-  integrity sha512-HJYXMGsDfCJ1GeDfHPA5wyaz4t2VuHTDaxm6vktdHZDU/gBUyrppEdmOf92iFS4yuWj5GBzqd4rXLOXUcbRCvQ==
+byron-kline-datafeed@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/byron-kline-datafeed/-/byron-kline-datafeed-1.0.5.tgz#67a3b46a329983ed7ebaba9bb873570e1e9112c2"
+  integrity sha512-5bX37gxkQaUetWJfWSo9eXCoK6bpO1h3AYouWqA3hUUDvM5MIdn7LqE1fVW6dd/96U7gMew6rW9+E7Zp5Pgv0A==
 
 bytes@3.0.0:
   version "3.0.0"
@@ -3604,6 +3604,11 @@ jsprim@^1.2.2:
     extsprintf "1.3.0"
     json-schema "0.2.3"
     verror "1.10.0"
+
+jstz@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/jstz/-/jstz-2.1.1.tgz#fff3373a518fa7cce69299930466f5a2b980389d"
+  integrity sha512-8hfl5RD6P7rEeIbzStBz3h4f+BQHfq/ABtoU6gXKQv5OcZhnmrIpG7e1pYaZ8hS9e0mp+bxUj08fnDUbKctYyA==
 
 killable@^1.0.1:
   version "1.0.1"
