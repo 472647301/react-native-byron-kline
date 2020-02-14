@@ -1,7 +1,13 @@
 <template>
   <div id="app">
     <div id="tradingview"></div>
-    <img @click="imageUrl = ''" v-if="imageUrl" :src="imageUrl" alt class="image" />
+    <img
+      @click="imageUrl = ''"
+      v-if="imageUrl"
+      :src="imageUrl"
+      alt
+      class="image"
+    />
   </div>
 </template>
 
@@ -184,7 +190,9 @@ class App extends mixins(MainMixin) {
           //     data.interval,
           //     10
           //   )
-          chart.setResolution(data.interval, function() {})
+          chart.setResolution(data.interval, function() {
+            chart.executeActionById('timeScaleReset')
+          })
           // const _r = chart.getVisibleRange()
           // console.warn(' >> setVisibleRange:', to, from, _r)
           // chart.setVisibleRange({ to: to, from: from }, () => {
