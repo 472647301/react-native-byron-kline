@@ -1,1 +1,1 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[18],[]]);
+(window.tvWebpackJsonp=window.tvWebpackJsonp||[]).push([[18],[]]);

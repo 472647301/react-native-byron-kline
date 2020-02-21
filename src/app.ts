@@ -121,23 +121,18 @@ class KlineChart extends Vue {
           const name = data.studyName
           const value = data.studyValue || []
           const chart = this.widget.chart()
-          chart.createStudy(
-            name,
-            false,
-            false,
-            value,
-            undefined,
-            data.studyPlot
-          ).then(v => {
-            console.info(' >> Created study success:', data.studyId, v, value)
-            if (data.studyId && v) {
-              this.studyList[data.studyId] = v
-            }
-            const _msg = JSON.stringify({
-              event: IHtmlEvents.STUDY_DONE
+          chart
+            .createStudy(name, false, false, value, undefined, data.studyPlot)
+            .then(v => {
+              console.info(' >> Created study success:', data.studyId, v, value)
+              if (data.studyId && v) {
+                this.studyList[data.studyId] = v
+              }
+              const _msg = JSON.stringify({
+                event: IHtmlEvents.STUDY_DONE
+              })
+              this.sendMessageToNative(_msg)
             })
-            this.sendMessageToNative(_msg)
-          })
         }
         break
       case INativeEvents.INTERVAL: // 图表周期
@@ -291,16 +286,22 @@ class KlineChart extends Vue {
     }
     const _c = this.chartingLibraryWidgetOptions
     if (_c && _c.disabled_features && _data.disabled_features) {
-      _c.disabled_features = _c.disabled_features.concat(_data.disabled_features)
+      _c.disabled_features = _c.disabled_features.concat(
+        _data.disabled_features
+      )
     }
     if (_c && _c.enabled_features && _data.enabled_features) {
       _c.enabled_features = _c.enabled_features.concat(_data.enabled_features)
     }
     this.widget = new TradingView.widget(Object.assign(_data, _c))
-    await this.appendScript('bundles/byron-kline-chart-init.js')
-    this.appendScript('bundles/runtime.d2ecd186b98a62a23c4b.js')
-    this.appendScript('bundles/vendors.f7dbb6a11b34b2534314.js')
-    this.appendScript('bundles/library.ac4616c46f24eefd2d78.js')
+    // await this.appendScript('bundles/byron-kline-chart-init.js')
+    // this.appendScript('bundles/runtime.d2ecd186b98a62a23c4b.js')
+    // this.appendScript('bundles/vendors.f7dbb6a11b34b2534314.js')
+    // this.appendScript('bundles/library.ac4616c46f24eefd2d78.js')
+    require('./script/init.js')
+    require('./script/runtime.js')
+    require('./script/vendors.js')
+    require('./script/library.js')
   }
 
   /**
@@ -333,23 +334,23 @@ class KlineChart extends Vue {
   }
 
   // 加载脚本
-  public appendScript(src: string) {
-    return new Promise(resolve => {
-      const script = document.createElement('script')
-      script.src = src
-      document.head.appendChild(script)
-      script.onload = function () {
-        resolve()
-        console.info(` >> ${src} 初始化成功`)
-      }
-    })
-  }
+  // public appendScript(src: string) {
+  //   return new Promise(resolve => {
+  //     const script = document.createElement('script')
+  //     script.src = src
+  //     document.head.appendChild(script)
+  //     script.onload = function() {
+  //       resolve()
+  //       console.info(` >> ${src} 初始化成功`)
+  //     }
+  //   })
+  // }
 
   public created() {
     window.sendMessageToHtml = this.receiveNativeNotification.bind(this)
   }
 
-  public mounted() { }
+  public mounted() {}
 }
 
 export default KlineChart
