@@ -4,7 +4,7 @@ function sendMessageToHtml(event, options) {
     return "\n  window.sendMessageToHtml(" + JSON.stringify({
         event: event,
         data: options
-    }) + ")\n  ";
+    }) + ");\n  true;";
 }
 exports.sendMessageToHtml = sendMessageToHtml;
 var KLineNativeEvents;

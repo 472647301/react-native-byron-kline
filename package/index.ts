@@ -4,7 +4,7 @@ export function sendMessageToHtml(event: KLineNativeEvents, options: KLineOption
   return "\n  window.sendMessageToHtml(" + JSON.stringify({
     event: event,
     data: options
-  }) + ")\n  ";
+  }) + ");\n  true;";
 }
 
 export interface KLineBar {

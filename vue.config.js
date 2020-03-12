@@ -13,5 +13,8 @@ module.exports = {
       }),
       new HtmlWebpackInlineSourcePlugin() // 实例化内联资源插件
     ]
+  },
+  devServer: {
+    port: 8088
   }
 }

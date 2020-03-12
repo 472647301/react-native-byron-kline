@@ -47,7 +47,7 @@ class KlineChart extends Vue {
   /**
    * 接收原生通知
    */
-  public receiveNativeNotification(msg: INativeNotice) {
+  public async receiveNativeNotification(msg: INativeNotice) {
     const data = msg.data || {}
     console.info(' >> Receive native notification:', msg)
     switch (msg.event) {
@@ -89,10 +89,6 @@ class KlineChart extends Vue {
         if (data.kline && this.awaitRequest) {
           this.klineData = data.kline
           this.awaitRequest = false
-          const _msg = JSON.stringify({
-            event: IHtmlEvents.HISTORY_DONE
-          })
-          this.sendMessageToNative(_msg)
         }
         break
       case INativeEvents.SUBSCRIBE: // 图表订阅
@@ -234,16 +230,24 @@ class KlineChart extends Vue {
       exchange: symbol,
       listed_exchange: symbol,
       timezone: jstz.determine().name(),
-      format: '',
+      format: 'price',
       pricescale: this.pricescale,
       minmov: 1,
       has_empty_bars: true,
       has_intraday: true,
+      volume_precision: 2,
       supported_resolutions: ['1', '5', '15', '30', '60', 'D', 'W', 'M']
     }
     this.datafeed = new Datafeed({
       history: params => {
-        return this.fetchHistoryData(params)
+        return this.fetchHistoryData(params).then(list => {
+          const _msg = JSON.stringify({
+            event: IHtmlEvents.HISTORY_DONE,
+            data: params
+          })
+          this.sendMessageToNative(_msg)
+          return list
+        })
       },
       config: () => {
         const _c = this.datafeedConfiguration
@@ -259,7 +263,7 @@ class KlineChart extends Vue {
   /**
    * 初始化图表
    */
-  public async initTradingView() {
+  public initTradingView() {
     if (!this.datafeed) {
       return
     }

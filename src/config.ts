@@ -22,9 +22,7 @@ export const disabled = [
   'property_pages' // 禁用所有属性页
 ]
 
-export const enabled = [
-  'hide_last_na_study_output'
-]
+export const enabled = ['hide_last_na_study_output']
 
 export const studies = {
   'volume.volume.color.0': '#cb4848',
@@ -34,7 +32,7 @@ export const studies = {
   'MACD.MACD.color': '#1c65a6', // macd线颜色
   'MACD.Signal.color': '#cc4a4a', // macd信号线线颜色
   'MACD.Signal.linewidth': 4, // macd信号线宽
-  'MACD.Histogram.linewidth': 4, // macd柱状图宽
+  'MACD.Histogram.linewidth': 4 // macd柱状图宽
 }
 
 export const cross = {
@@ -48,7 +46,7 @@ export const volume = {
 }
 
 export const overrides = {
-  'volumePaneSize': 'medium', // 支持的值: large, medium, small, tiny
+  volumePaneSize: 'medium', // 支持的值: large, medium, small, tiny
   'timeScale.rightOffset': 10,
   'mainSeriesProperties.style': 1,
   'paneProperties.background': '#12151c',
