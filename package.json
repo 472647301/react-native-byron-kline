@@ -7,6 +7,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "babel-polyfill": "^6.26.0",
     "byron-kline-chart": "^1.0.5",
     "byron-kline-datafeed": "^1.0.5",
     "html2canvas": "^1.0.0-rc.5",

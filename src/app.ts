@@ -1,3 +1,4 @@
+import 'babel-polyfill'
 import Vue from 'vue'
 import jstz from 'jstz'
 import Component from 'vue-class-component'
