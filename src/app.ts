@@ -119,7 +119,7 @@ class KlineChart extends Vue {
           const value = data.studyValue || []
           const chart = this.widget.chart()
           chart
-            .createStudy(name, false, false, value, undefined, data.studyPlot)
+            .createStudy(name, false, false, value, data.studyPlot)
             .then(v => {
               console.info(' >> Created study success:', data.studyId, v, value)
               if (data.studyId && v) {
@@ -435,7 +435,7 @@ type INativeData = {
   studyName?: string
   studyValue?: Array<number>
   studyId?: string
-  studyPlot?: TradingView.CreateStudyOptions
+  studyPlot?: TradingView.StudyOverrides
   event?: string
   data?: any
 }
