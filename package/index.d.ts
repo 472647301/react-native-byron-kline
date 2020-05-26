@@ -26,7 +26,7 @@ export interface KLineOptions {
   studyName?: string
   studyValue?: Array<number>
   studyId?: string
-  studyPlot?: TradingView.CreateStudyOptions
+  studyPlot?: TradingView.StudyOverrides
   event?: string
   data?: any
 }
