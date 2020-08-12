@@ -6,7 +6,7 @@
 - [完整案例Example](https://github.com/472647301/ReactNativeKLine/blob/master/App.tsx)
 
 ## 用法
-`$ yarn add react-native-byron-kline --save`
+`$ yarn add byron-kline --save`
 
 ```javascript
 import React from 'react';
