@@ -1,5 +1,7 @@
 # react-native-byron-kline
 
+**Note:** 此仓库已停止开发维护，推荐使用[react-native-kline](https://github.com/472647301/react-native-kline)
+
 基于TradingView的 react-native k线图表
 
 - [TradingView api](https://b.aitrade.ga/books/tradingview/)
